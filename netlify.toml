@@ -1,14 +1,9 @@
 [build]
   command = "npm run build"
-  publish = ".next"
+  publish = "out"
 
 [build.environment]
   NODE_VERSION = "18"
-
-[[redirects]]
-  from = "/home"
-  to = "/"
-  status = 301
 
 [[headers]]
   for = "/*"
@@ -27,3 +22,8 @@
   for = "/_next/static/*"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
+
+[[redirects]]
+  from = "/home"
+  to = "/"
+  status = 301

@@ -5,21 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "node server.js",
-    "start:next": "next start",
-    "lint": "next lint",
-    "lint:fix": "next lint --fix",
-    "type-check": "tsc --noEmit",
-    "format": "prettier --write .",
-    "format:check": "prettier --check .",
-    "test": "echo \"No tests specified\" && exit 0",
-    "clean": "rm -rf .next out node_modules/.cache",
-    "analyze": "ANALYZE=true npm run build",
-    "docker:build": "docker build -t wedding-invite .",
-    "docker:run": "docker run -p 3000:3000 wedding-invite",
-    "docker:dev": "docker-compose up -d",
-    "docker:down": "docker-compose down",
-    "export": "next export"
+    "start": "next start",
+    "lint": "next lint"
   },
   "dependencies": {
     "@headlessui/react": "^1.7.17",

@@ -1,0 +1,22 @@
+{
+  "name": "wedding-invite",
+  "version": "1.0.0",
+  "description": "Convite de Casamento Anthony & Esther",
+  "domain": "flowdamemorizacao.com",
+  "build": {
+    "command": "npm run build",
+    "outputDirectory": ".next",
+    "nodeVersion": "20"
+  },
+  "deploy": {
+    "platform": "turbo-cloud",
+    "region": "us-east-1",
+    "environment": "production"
+  },
+  "features": {
+    "https": true,
+    "cdn": true,
+    "compression": true,
+    "caching": true
+  }
+}

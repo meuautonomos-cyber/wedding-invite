@@ -1,0 +1,26 @@
+{
+  "name": "Convite de Casamento - Anthony & Esther",
+  "short_name": "Casamento AE",
+  "description": "Convite de casamento de Anthony & Esther - 21 de março de 2026",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fefdf8",
+  "theme_color": "#339970",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["lifestyle", "social"],
+  "lang": "pt-BR"
+}

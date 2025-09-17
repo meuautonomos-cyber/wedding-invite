@@ -1,0 +1,22 @@
+{
+  "domain": "flowdamemorizacao.com",
+  "siteUrl": "https://flowdamemorizacao.com",
+  "siteName": "Anthony & Esther",
+  "description": "Convite de Casamento - 21/03/26, 15:30h",
+  "buildCommand": "npm run build",
+  "outputDirectory": ".next",
+  "nodeVersion": "20",
+  "server": {
+    "ip": "45.148.96.61",
+    "nameservers": [
+      "ns1.brasil116-4060.com.br",
+      "ns2.brasil116-4060.com.br"
+    ],
+    "ssl": {
+      "status": "valid",
+      "issuer": "WE1",
+      "startDate": "09/09/2025",
+      "endDate": "08/12/2025"
+    }
+  }
+}

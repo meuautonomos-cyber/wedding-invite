@@ -1,0 +1,19 @@
+{
+  "name": "wedding-invite",
+  "version": "1.0.0",
+  "description": "Convite de Casamento Anthony & Esther",
+  "main": "next.config.js",
+  "scripts": {
+    "build": "next build",
+    "start": "next start"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "deploy": {
+    "type": "nextjs",
+    "buildCommand": "npm run build",
+    "startCommand": "npm start",
+    "outputDirectory": ".next"
+  }
+}

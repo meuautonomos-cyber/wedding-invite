@@ -1,0 +1,34 @@
+<svg width="1080" height="220" viewBox="0 0 1080 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Floral top decoration -->
+  <defs>
+    <linearGradient id="floralGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#F7F2E8;stop-opacity:0.8" />
+      <stop offset="100%" style="stop-color:#E8E1D3;stop-opacity:0.3" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Left corner floral -->
+  <g opacity="0.6">
+    <circle cx="120" cy="60" r="25" fill="#6E8643" opacity="0.3"/>
+    <circle cx="140" cy="80" r="20" fill="#6E8643" opacity="0.4"/>
+    <circle cx="100" cy="90" r="18" fill="#6E8643" opacity="0.3"/>
+    <circle cx="160" cy="100" r="22" fill="#6E8643" opacity="0.2"/>
+    <circle cx="80" cy="110" r="15" fill="#6E8643" opacity="0.3"/>
+  </g>
+  
+  <!-- Right corner floral -->
+  <g opacity="0.6">
+    <circle cx="960" cy="60" r="25" fill="#6E8643" opacity="0.3"/>
+    <circle cx="940" cy="80" r="20" fill="#6E8643" opacity="0.4"/>
+    <circle cx="980" cy="90" r="18" fill="#6E8643" opacity="0.3"/>
+    <circle cx="920" cy="100" r="22" fill="#6E8643" opacity="0.2"/>
+    <circle cx="1000" cy="110" r="15" fill="#6E8643" opacity="0.3"/>
+  </g>
+  
+  <!-- Center subtle pattern -->
+  <g opacity="0.2">
+    <circle cx="540" cy="50" r="30" fill="#6E8643" opacity="0.1"/>
+    <circle cx="500" cy="80" r="20" fill="#6E8643" opacity="0.1"/>
+    <circle cx="580" cy="80" r="20" fill="#6E8643" opacity="0.1"/>
+  </g>
+</svg>

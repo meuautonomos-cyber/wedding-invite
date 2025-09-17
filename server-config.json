@@ -1,0 +1,47 @@
+{
+  "domain": "flowdamemorizacao.com",
+  "server": {
+    "provider": "Turbo Cloud",
+    "ip": "45.148.96.61",
+    "nameservers": [
+      {
+        "name": "ns1.brasil116-4060.com.br",
+        "ip": "45.148.96.61"
+      },
+      {
+        "name": "ns2.brasil116-4060.com.br", 
+        "ip": "45.148.96.58"
+      }
+    ],
+    "ssl": {
+      "status": "valid",
+      "issuer": "WE1",
+      "startDate": "09/09/2025",
+      "endDate": "08/12/2025",
+      "autoRenewal": true
+    }
+  },
+  "deployment": {
+    "platform": "turbo-cloud",
+    "buildCommand": "npm run build",
+    "outputDirectory": ".next",
+    "nodeVersion": "20",
+    "environment": "production"
+  },
+  "dns": {
+    "records": [
+      {
+        "type": "A",
+        "name": "@",
+        "value": "45.148.96.61",
+        "ttl": 3600
+      },
+      {
+        "type": "CNAME",
+        "name": "www",
+        "value": "flowdamemorizacao.com",
+        "ttl": 3600
+      }
+    ]
+  }
+}

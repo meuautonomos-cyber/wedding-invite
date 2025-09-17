@@ -219,6 +219,10 @@ export default function VideoPage() {
                 className="w-full h-screen max-h-[80vh] object-cover"
                 poster={video_convite.poster}
                 onEnded={handleVideoEnd}
+                onError={(e) => {
+                  console.error('Erro no vídeo padrão:', e);
+                  console.log('URL do vídeo:', video_convite.url);
+                }}
                 preload="metadata"
                 playsInline
                 muted={false}

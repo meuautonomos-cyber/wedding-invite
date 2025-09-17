@@ -25,8 +25,29 @@ export default function VideoPage() {
     // Verificar se há um vídeo carregado pelo admin
     const loadVideo = () => {
       console.log('VideoPage - Carregando vídeo...')
+      console.log('VideoPage - localStorage disponível:', typeof window !== 'undefined')
+      
+      // Verificar diretamente no localStorage
+      if (typeof window !== 'undefined') {
+        const stored = localStorage.getItem('wedding-video-data')
+        console.log('VideoPage - Dados brutos do localStorage:', stored ? 'ENCONTRADO' : 'VAZIO')
+        if (stored) {
+          try {
+            const parsed = JSON.parse(stored)
+            console.log('VideoPage - Dados parseados:', {
+              id: parsed?.id,
+              name: parsed?.name,
+              hasUrl: !!parsed?.url,
+              urlLength: parsed?.url?.length
+            })
+          } catch (e) {
+            console.error('VideoPage - Erro ao fazer parse:', e)
+          }
+        }
+      }
+      
       const currentVideo = videoStorage.getCurrentVideo()
-      console.log('VideoPage - Vídeo atual:', currentVideo)
+      console.log('VideoPage - Vídeo atual do videoStorage:', currentVideo)
       
       if (currentVideo && currentVideo.url) {
         console.log('VideoPage - Definindo adminVideo:', currentVideo.url.substring(0, 50) + '...')

@@ -17,11 +17,6 @@
 [build.processing.skip_processing]
   paths = ["/admin", "/admin/*", "/_next/static/*", "/.next/*", "/out/*"]
 
-# Desabilitar detecção de secrets completamente
-[build.processing]
-  skip_processing = false
-  skip_processing_paths = ["/admin", "/admin/*", "/_next/static/*", "/.next/*", "/out/*"]
-
 [[redirects]]
   from = "/*"
   to = "/index.html"

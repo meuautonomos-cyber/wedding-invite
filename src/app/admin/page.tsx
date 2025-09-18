@@ -5,7 +5,6 @@ import { motion } from 'framer-motion'
 import { cms } from '@/lib/cms'
 import { videoStorage } from '@/lib/videoStorage'
 import { RSVPData, GiftData } from '@/types'
-import { testSupabaseConnection } from '@/lib/testSupabase'
 import { 
   UsersIcon,
   GiftIcon,
@@ -239,15 +238,6 @@ export default function AdminPage() {
             <PhoneIcon className="w-5 h-5 inline mr-2" />
             Configurar WhatsApp
           </a>
-          <button
-            onClick={async () => {
-              const result = await testSupabaseConnection()
-              alert(result.success ? result.message : `Erro: ${result.error}`)
-            }}
-            className="px-4 py-2 rounded-lg font-medium transition-colors bg-blue-500 text-white hover:bg-blue-600"
-          >
-            Testar Supabase
-          </button>
         </div>
 
         {/* RSVP Tab */}

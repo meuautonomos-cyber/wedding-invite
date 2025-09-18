@@ -1,0 +1,12 @@
+{
+  "site": {
+    "id": "eclectic-biscochitos-4c5969"
+  },
+  "build": {
+    "processing": {
+      "secrets": {
+        "enabled": false
+      }
+    }
+  }
+}

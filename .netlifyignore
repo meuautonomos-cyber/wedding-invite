@@ -1,0 +1,6 @@
+# Ignorar arquivos que podem conter secrets
+.next/
+.netlify/
+node_modules/
+*.log
+.env*

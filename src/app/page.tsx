@@ -57,51 +57,51 @@ export default function HomePage() {
         </motion.div>
 
         {/* Área clicável dos ícones - RESPONSIVO */}
-        <div className="absolute bottom-20 sm:bottom-24 md:bottom-28 left-1/2 transform -translate-x-1/2 w-full max-w-xs sm:max-w-sm md:max-w-2xl px-4">
-          <div className="grid grid-cols-4 gap-2 sm:gap-4 md:gap-8 justify-items-center">
+        <div className="absolute bottom-16 sm:bottom-20 md:bottom-24 left-1/2 transform -translate-x-1/2 w-full max-w-xs sm:max-w-sm md:max-w-2xl px-4">
+          <div className="grid grid-cols-4 gap-1 sm:gap-2 md:gap-4 justify-items-center">
             
             {/* Site */}
             <motion.a
               href="/site"
-              className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-full cursor-pointer group"
+              className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-full cursor-pointer group"
               aria-label="Abrir site do casamento"
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
             >
-              <div className="w-full h-full rounded-full focus:outline-none focus:ring-4 focus:ring-wedding-gold focus:ring-offset-2 group-hover:bg-wedding-gold/10 transition-all duration-300" />
+              <div className="w-full h-full rounded-full focus:outline-none focus:ring-2 focus:ring-wedding-gold focus:ring-offset-1 group-hover:bg-wedding-gold/10 transition-all duration-300" />
             </motion.a>
 
             {/* Lista de presentes */}
             <motion.a
               href="/presentes"
-              className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-full cursor-pointer group"
+              className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-full cursor-pointer group"
               aria-label="Abrir lista de presentes"
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
             >
-              <div className="w-full h-full rounded-full focus:outline-none focus:ring-4 focus:ring-wedding-gold focus:ring-offset-2 group-hover:bg-wedding-gold/10 transition-all duration-300" />
+              <div className="w-full h-full rounded-full focus:outline-none focus:ring-2 focus:ring-wedding-gold focus:ring-offset-1 group-hover:bg-wedding-gold/10 transition-all duration-300" />
             </motion.a>
 
             {/* Confirmar presença */}
             <motion.a
               href="/confirmar"
-              className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-full cursor-pointer group"
+              className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-full cursor-pointer group"
               aria-label="Confirmar presença"
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
             >
-              <div className="w-full h-full rounded-full focus:outline-none focus:ring-4 focus:ring-wedding-gold focus:ring-offset-2 group-hover:bg-wedding-gold/10 transition-all duration-300" />
+              <div className="w-full h-full rounded-full focus:outline-none focus:ring-2 focus:ring-wedding-gold focus:ring-offset-1 group-hover:bg-wedding-gold/10 transition-all duration-300" />
             </motion.a>
 
             {/* Local */}
             <motion.a
               href="/local"
-              className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-full cursor-pointer group"
+              className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 rounded-full cursor-pointer group"
               aria-label="Ver local do evento"
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
             >
-              <div className="w-full h-full rounded-full focus:outline-none focus:ring-4 focus:ring-wedding-gold focus:ring-offset-2 group-hover:bg-wedding-gold/10 transition-all duration-300" />
+              <div className="w-full h-full rounded-full focus:outline-none focus:ring-2 focus:ring-wedding-gold focus:ring-offset-1 group-hover:bg-wedding-gold/10 transition-all duration-300" />
             </motion.a>
           </div>
         </div>

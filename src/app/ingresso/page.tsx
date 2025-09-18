@@ -5,16 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState, Suspense } from 'react'
 import { ArrowLeftIcon, CheckCircleIcon, CalendarIcon, MapPinIcon, ClockIcon } from '@heroicons/react/24/outline'
 import { weddingData } from '@/data/weddingData'
-
-interface TicketData {
-  id: string
-  nome: string
-  email: string
-  status: 'confirmado' | 'com_acompanhante' | 'nao_poderei'
-  acompanhante?: string
-  dataConfirmacao: string
-  observacoes?: string
-}
+import { supabaseStorage, TicketData } from '@/lib/supabaseStorage'
 
 function IngressoContent() {
   const router = useRouter()
@@ -34,22 +25,17 @@ function IngressoContent() {
     }
 
     // Buscar dados do ingresso
-    const loadTicket = () => {
+    const loadTicket = async () => {
       try {
-        const storedTickets = localStorage.getItem('wedding-tickets')
-        if (storedTickets) {
-          const tickets: TicketData[] = JSON.parse(storedTickets)
-          const ticket = tickets.find(t => t.id === ticketId)
-          
-          if (ticket) {
-            setTicketData(ticket)
-          } else {
-            setError('Ingresso não encontrado')
-          }
+        const ticket = await supabaseStorage.getTicketById(ticketId)
+        
+        if (ticket) {
+          setTicketData(ticket)
         } else {
-          setError('Nenhum ingresso encontrado')
+          setError('Ingresso não encontrado')
         }
       } catch (err) {
+        console.error('Erro ao carregar ingresso:', err)
         setError('Erro ao carregar ingresso')
       } finally {
         setLoading(false)

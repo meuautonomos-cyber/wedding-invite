@@ -4,8 +4,7 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import { weddingData } from '@/data/weddingData'
-import { RSVPData } from '@/types'
-import { ticketStorage, TicketData } from '@/lib/ticketStorage'
+import { supabaseStorage, TicketData, RSVPData } from '@/lib/supabaseStorage'
 import { 
   ArrowLeftIcon,
   CheckCircleIcon,
@@ -16,15 +15,14 @@ import {
 export default function ConfirmarPage() {
   const router = useRouter()
   const { noivos, evento, rsvp } = weddingData.casamento
-  const [formData, setFormData] = useState<RSVPData>({
+  const [formData, setFormData] = useState<Omit<RSVPData, 'id' | 'data_confirmacao'>>({
     nome: '',
     telefone: '',
     email: '',
     quantidade_convidados: 1,
     restricoes_alimentares: '',
     observacoes: '',
-    status: 'confirmado',
-    data_confirmacao: new Date().toISOString()
+    status: 'confirmado'
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showSuccess, setShowSuccess] = useState(false)
@@ -55,11 +53,25 @@ export default function ConfirmarPage() {
 
     try {
       // Verificar se email já existe
-      if (ticketStorage.hasEmail(formData.email)) {
+      const emailExists = await supabaseStorage.hasEmail(formData.email)
+      if (emailExists) {
         setDuplicateEmail(true)
         setIsSubmitting(false)
         return
       }
+
+      // Criar RSVP primeiro
+      const rsvpData: Omit<RSVPData, 'id' | 'data_confirmacao'> = {
+        nome: formData.nome,
+        telefone: formData.telefone,
+        email: formData.email,
+        quantidade_convidados: formData.quantidade_convidados,
+        restricoes_alimentares: formData.restricoes_alimentares || '',
+        observacoes: formData.observacoes || '',
+        status: formData.status
+      }
+
+      await supabaseStorage.createRSVP(rsvpData)
 
       // Criar ingresso
       const ticketData: Omit<TicketData, 'id' | 'dataConfirmacao'> = {
@@ -74,17 +86,14 @@ export default function ConfirmarPage() {
         ticketData.acompanhante = formData.observacoes
       }
 
-      const ticket = ticketStorage.createTicket(ticketData)
+      const ticket = await supabaseStorage.createTicket(ticketData)
 
-      console.log('Ingresso criado:', ticket)
-      
-      // Simular delay da API
-      await new Promise(resolve => setTimeout(resolve, 2000))
+      console.log('RSVP e ingresso criados:', ticket)
       
       setTicketId(ticket.id)
       setShowSuccess(true)
     } catch (error) {
-      console.error('Erro ao criar ingresso:', error)
+      console.error('Erro ao criar RSVP/ingresso:', error)
       setShowError(true)
     } finally {
       setIsSubmitting(false)

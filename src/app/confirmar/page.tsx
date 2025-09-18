@@ -5,6 +5,7 @@ import { motion } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import { weddingData } from '@/data/weddingData'
 import { RSVPData } from '@/types'
+import { ticketStorage, TicketData } from '@/lib/ticketStorage'
 import { 
   ArrowLeftIcon,
   CheckCircleIcon,
@@ -28,6 +29,8 @@ export default function ConfirmarPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showSuccess, setShowSuccess] = useState(false)
   const [showError, setShowError] = useState(false)
+  const [duplicateEmail, setDuplicateEmail] = useState(false)
+  const [ticketId, setTicketId] = useState<string | null>(null)
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target
@@ -48,28 +51,40 @@ export default function ConfirmarPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
+    setDuplicateEmail(false)
 
     try {
-      // Aqui você faria a integração com o backend para salvar o RSVP
-      // Por enquanto, apenas simulamos o sucesso
-      console.log('RSVP registrado:', formData)
+      // Verificar se email já existe
+      if (ticketStorage.hasEmail(formData.email)) {
+        setDuplicateEmail(true)
+        setIsSubmitting(false)
+        return
+      }
+
+      // Criar ingresso
+      const ticketData: Omit<TicketData, 'id' | 'dataConfirmacao'> = {
+        nome: formData.nome,
+        email: formData.email,
+        status: formData.status === 'nao_podera_ir' ? 'nao_poderei' : 
+                formData.status === 'com_acompanhante' ? 'com_acompanhante' : 'confirmado',
+        observacoes: formData.restricoes_alimentares || formData.observacoes || ''
+      }
+
+      if (formData.status === 'com_acompanhante' && formData.observacoes) {
+        ticketData.acompanhante = formData.observacoes
+      }
+
+      const ticket = ticketStorage.createTicket(ticketData)
+
+      console.log('Ingresso criado:', ticket)
       
       // Simular delay da API
       await new Promise(resolve => setTimeout(resolve, 2000))
       
+      setTicketId(ticket.id)
       setShowSuccess(true)
-      setFormData({
-        nome: '',
-        telefone: '',
-        email: '',
-        quantidade_convidados: 1,
-        restricoes_alimentares: '',
-        observacoes: '',
-        status: 'confirmado',
-        data_confirmacao: new Date().toISOString()
-      })
     } catch (error) {
-      console.error('Erro ao enviar RSVP:', error)
+      console.error('Erro ao criar ingresso:', error)
       setShowError(true)
     } finally {
       setIsSubmitting(false)
@@ -277,9 +292,16 @@ export default function ConfirmarPage() {
                     name="email"
                     value={formData.email}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-wedding-cream-300 rounded-lg focus:ring-2 focus:ring-wedding-green-500 focus:border-transparent"
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-wedding-green-500 focus:border-transparent ${
+                      duplicateEmail ? 'border-red-500' : 'border-wedding-cream-300'
+                    }`}
                     placeholder="seu@email.com"
                   />
+                  {duplicateEmail && (
+                    <p className="text-red-500 text-sm mt-1">
+                      Este email já foi utilizado para confirmar presença.
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
@@ -362,12 +384,28 @@ export default function ConfirmarPage() {
             <p className="text-wedding-green-700 mb-4">
               {rsvp.mensagem_pos_confirmacao}
             </p>
-            <button
-              onClick={() => setShowSuccess(false)}
-              className="btn-primary w-full"
-            >
-              Fechar
-            </button>
+            <p className="text-sm text-wedding-green-600 mb-4">
+              Seu ingresso foi gerado! Clique abaixo para visualizá-lo.
+            </p>
+            <div className="space-y-2">
+              <button
+                onClick={() => {
+                  setShowSuccess(false)
+                  if (ticketId) {
+                    router.push(`/ingresso?id=${ticketId}`)
+                  }
+                }}
+                className="btn-primary w-full"
+              >
+                Ver Meu Ingresso
+              </button>
+              <button
+                onClick={() => setShowSuccess(false)}
+                className="btn-outline w-full"
+              >
+                Fechar
+              </button>
+            </div>
           </motion.div>
         </motion.div>
 

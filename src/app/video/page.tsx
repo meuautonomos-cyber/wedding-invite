@@ -144,7 +144,7 @@ export default function VideoPage() {
 
 
   return (
-    <div className="min-h-screen bg-black">
+    <div className="min-h-screen bg-black page-container">
       {/* Header */}
       <header className="absolute top-4 left-4 z-10">
         <motion.button
@@ -160,7 +160,7 @@ export default function VideoPage() {
 
 
       {/* Conteúdo principal - Layout vertical otimizado */}
-      <main className="min-h-screen flex flex-col items-center justify-center px-4 py-4">
+      <main className="min-h-screen flex flex-col items-center justify-center px-4 py-4 max-w-md mx-auto">
         {/* Título e descrição - apenas quando o vídeo terminar */}
         {videoEnded && (
           <motion.div
@@ -191,7 +191,7 @@ export default function VideoPage() {
               <video
                 ref={videoRef}
                 src={adminVideo}
-                className="w-full h-screen max-h-[80vh] object-cover"
+                className="w-full max-w-sm h-auto max-h-[80vh] object-cover"
                 onEnded={handleVideoEnd}
                 onPlay={() => setIsPlaying(true)}
                 onPause={() => setIsPlaying(false)}

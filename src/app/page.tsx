@@ -10,7 +10,7 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-wedding-cream relative overflow-hidden">
+    <div className="min-h-screen bg-wedding-cream relative overflow-hidden page-container">
       {/* Layout principal como imagem de fundo */}
       <div
         className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
@@ -26,7 +26,7 @@ export default function HomePage() {
       <div className="absolute inset-0 bg-wedding-cream/5" aria-hidden="true" />
 
       {/* Conteúdo principal com posicionamento absoluto baseado no layout */}
-      <main className="relative z-10 w-full h-screen">
+      <main className="relative z-10 w-full min-h-screen max-h-screen overflow-hidden">
         
             {/* Área clicável do selo de cera - posicionada sobre o selo na imagem */}
             <motion.div

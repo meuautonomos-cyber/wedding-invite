@@ -138,4 +138,4 @@ export class WhatsAppService {
 }
 
 // Instância padrão - número será carregado do localStorage
-export const whatsappService = new WhatsAppService('27999999999') // Número padrão, será sobrescrito
+export const whatsappService = new WhatsAppService('27996372592') // Número do casal

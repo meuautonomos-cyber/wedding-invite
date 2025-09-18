@@ -14,10 +14,13 @@ export default function WhatsAppConfigPage() {
   const [testMessage, setTestMessage] = useState('')
 
   useEffect(() => {
-    // Carregar número salvo
+    // Carregar número salvo ou usar o padrão
     const savedNumber = localStorage.getItem('wedding-whatsapp-number')
     if (savedNumber) {
       setWhatsappNumber(savedNumber)
+    } else {
+      // Usar número padrão do casal
+      setWhatsappNumber('(27) 99637-2592')
     }
   }, [])
 

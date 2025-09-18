@@ -1,7 +1,15 @@
 import { createClient } from '@supabase/supabase-js'
 
+// Configuração do Supabase
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://zahvmkieicvohphrxwkr.supabase.co'
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InphaHZta2llaWN2b2hwcmh3a3IiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTc1ODE1NzIxOCwiZXhwIjoyMDczNzMzMjE4fQ.5_6ozxN44GiOHi1fPydx6rXquo-N3g-JF98-N8nenzc'
+
+// Verificar se as variáveis estão definidas
+if (!supabaseUrl || !supabaseKey) {
+  console.error('❌ Variáveis do Supabase não encontradas!')
+  console.error('URL:', supabaseUrl)
+  console.error('Key:', supabaseKey ? 'Definida' : 'Não definida')
+}
 
 export const supabase = createClient(supabaseUrl, supabaseKey)
 

@@ -9,6 +9,7 @@ if (!supabaseUrl || !supabaseKey) {
   console.error('❌ Variáveis do Supabase não encontradas!')
   console.error('URL:', supabaseUrl)
   console.error('Key:', supabaseKey ? 'Definida' : 'Não definida')
+  throw new Error('Variáveis de ambiente do Supabase não encontradas')
 }
 
 export const supabase = createClient(supabaseUrl, supabaseKey)

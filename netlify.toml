@@ -6,17 +6,6 @@
   NODE_VERSION = "18"
   SECRETS_SCAN_ENABLED = "false"
 
-# Desabilitar scan de secrets
-[build.processing]
-  skip_processing = false
-
-[build.processing.secrets]
-  enabled = false
-
-# Configurações específicas para desabilitar scan
-[build.processing.skip_processing]
-  paths = ["/admin", "/admin/*", "/_next/static/*", "/.next/*", "/out/*"]
-
 [[redirects]]
   from = "/*"
   to = "/index.html"

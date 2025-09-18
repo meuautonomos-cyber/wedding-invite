@@ -1,11 +1,5 @@
-# Ignorar arquivos que podem conter secrets
+# Ignorar arquivos desnecessários
 .next/
-.netlify/
 node_modules/
 *.log
 .env*
-out/
-build/
-dist/
-*.pack
-*.js.map

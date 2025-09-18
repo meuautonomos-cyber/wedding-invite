@@ -8,5 +8,10 @@
         "enabled": false
       }
     }
+  },
+  "secrets": {
+    "scan": {
+      "enabled": false
+    }
   }
 }

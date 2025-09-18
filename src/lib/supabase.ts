@@ -1,8 +1,8 @@
 import { createClient } from '@supabase/supabase-js'
 
-// Configuração do Supabase
+// Configuração do Supabase - usando variáveis de ambiente
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://zahvmkieicvohphrxwkr.supabase.co'
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InphaHZta2llaWN2b2hwcmh3a3IiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTc1ODE1NzIxOCwiZXhwIjoyMDczNzMzMjE4fQ.5_6ozxN44GiOHi1fPydx6rXquo-N3g-JF98-N8nenzc'
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InphaHZta2llaWN2b2hwaHJ4d2tyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgxNTcyMTgsImV4cCI6MjA3MzczMzIxOH0.5_6ozxN44GiOHi1fPydx6rXquo-N3g-JF98-N8nenzc'
 
 // Verificar se as variáveis estão definidas
 if (!supabaseUrl || !supabaseKey) {

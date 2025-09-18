@@ -91,16 +91,15 @@ export default function ConfirmarPage() {
 
       console.log('RSVP e ingresso criados:', ticket)
       
-      // Enviar WhatsApp automaticamente
-      try {
-        // Carregar número do WhatsApp salvo
-        const savedNumber = localStorage.getItem('wedding-whatsapp-number')
-        if (savedNumber) {
+      // Enviar WhatsApp automaticamente APENAS se confirmar presença
+      if (formData.status !== 'nao_podera_ir') {
+        try {
+          // Carregar número do WhatsApp salvo
+          const savedNumber = localStorage.getItem('wedding-whatsapp-number') || '27996372592'
           const whatsappMessage = {
             nome: formData.nome,
             telefone: formData.telefone,
-            status: formData.status === 'nao_podera_ir' ? 'nao_poderei' : 
-                    formData.status === 'com_acompanhante' ? 'com_acompanhante' : 'confirmado',
+            status: formData.status === 'com_acompanhante' ? 'com_acompanhante' : 'confirmado',
             acompanhante: formData.status === 'com_acompanhante' ? formData.observacoes : undefined,
             observacoes: formData.restricoes_alimentares || formData.observacoes || '',
             ticketId: ticket.id
@@ -109,10 +108,10 @@ export default function ConfirmarPage() {
           // Criar instância com número salvo
           const service = new (whatsappService.constructor as any)(savedNumber)
           service.openWhatsApp(whatsappMessage)
+        } catch (error) {
+          console.error('Erro ao enviar WhatsApp:', error)
+          // Não falha o processo se o WhatsApp der erro
         }
-      } catch (error) {
-        console.error('Erro ao enviar WhatsApp:', error)
-        // Não falha o processo se o WhatsApp der erro
       }
       
       setTicketId(ticket.id)

@@ -12,7 +12,8 @@ import {
   TrashIcon,
   VideoCameraIcon,
   CloudArrowUpIcon,
-  PlayIcon
+  PlayIcon,
+  PhoneIcon
 } from '@heroicons/react/24/outline'
 
 export default function AdminPage() {
@@ -230,6 +231,13 @@ export default function AdminPage() {
             <VideoCameraIcon className="w-5 h-5 inline mr-2" />
             Vídeo Convite
           </button>
+          <a
+            href="/admin/whatsapp"
+            className="px-4 py-2 rounded-lg font-medium transition-colors bg-white text-wedding-green-700 hover:bg-wedding-green-50 border border-wedding-green-200"
+          >
+            <PhoneIcon className="w-5 h-5 inline mr-2" />
+            Configurar WhatsApp
+          </a>
         </div>
 
         {/* RSVP Tab */}

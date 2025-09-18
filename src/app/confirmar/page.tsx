@@ -5,6 +5,7 @@ import { motion } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import { weddingData } from '@/data/weddingData'
 import { supabaseStorage, TicketData, RSVPData } from '@/lib/supabaseStorage'
+import { whatsappService } from '@/lib/whatsappService'
 import { 
   ArrowLeftIcon,
   CheckCircleIcon,
@@ -89,6 +90,30 @@ export default function ConfirmarPage() {
       const ticket = await supabaseStorage.createTicket(ticketData)
 
       console.log('RSVP e ingresso criados:', ticket)
+      
+      // Enviar WhatsApp automaticamente
+      try {
+        // Carregar número do WhatsApp salvo
+        const savedNumber = localStorage.getItem('wedding-whatsapp-number')
+        if (savedNumber) {
+          const whatsappMessage = {
+            nome: formData.nome,
+            telefone: formData.telefone,
+            status: formData.status === 'nao_podera_ir' ? 'nao_poderei' : 
+                    formData.status === 'com_acompanhante' ? 'com_acompanhante' : 'confirmado',
+            acompanhante: formData.status === 'com_acompanhante' ? formData.observacoes : undefined,
+            observacoes: formData.restricoes_alimentares || formData.observacoes || '',
+            ticketId: ticket.id
+          }
+          
+          // Criar instância com número salvo
+          const service = new (whatsappService.constructor as any)(savedNumber)
+          service.openWhatsApp(whatsappMessage)
+        }
+      } catch (error) {
+        console.error('Erro ao enviar WhatsApp:', error)
+        // Não falha o processo se o WhatsApp der erro
+      }
       
       setTicketId(ticket.id)
       setShowSuccess(true)
@@ -394,7 +419,7 @@ export default function ConfirmarPage() {
               {rsvp.mensagem_pos_confirmacao}
             </p>
             <p className="text-sm text-wedding-green-600 mb-4">
-              Seu ingresso foi gerado! Clique abaixo para visualizá-lo.
+              Seu ingresso foi gerado e uma mensagem foi enviada para seu WhatsApp com todas as informações!
             </p>
             <div className="space-y-2">
               <button

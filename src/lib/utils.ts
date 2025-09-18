@@ -59,6 +59,7 @@ export function addToCalendar(
   const isIOS = /iphone|ipad|ipod/.test(userAgent)
   const isAndroid = /android/.test(userAgent)
   const isMac = /macintosh|mac os x/.test(userAgent)
+  const isSafari = /safari/.test(userAgent) && !/chrome/.test(userAgent)
   
   // Formatar datas para URLs
   const start = new Date(startDate)
@@ -69,41 +70,64 @@ export function addToCalendar(
     return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z'
   }
   
-  // Formato para Apple Calendar
-  const formatForApple = (date: Date) => {
-    return date.toISOString().replace(/[-:]/g, '').split('.')[0]
-  }
   
   // URLs para diferentes calendários
   const googleUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${formatForGoogle(start)}/${formatForGoogle(end)}&details=${encodeURIComponent(description)}&location=${encodeURIComponent(location)}`
   
-  const appleUrl = `data:text/calendar;charset=utf8,BEGIN:VCALENDAR
-VERSION:2.0
-BEGIN:VEVENT
-DTSTART:${formatForApple(start)}
-DTEND:${formatForApple(end)}
-SUMMARY:${title}
-DESCRIPTION:${description}
-LOCATION:${location}
-END:VEVENT
-END:VCALENDAR`
+  // Gerar arquivo ICS para download
+  const icsContent = generateICS(title, description, startDate, endDate, location)
+  const icsBlob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' })
+  const icsUrl = URL.createObjectURL(icsBlob)
   
-  const outlookUrl = `https://outlook.live.com/calendar/0/deeplink/compose?subject=${encodeURIComponent(title)}&startdt=${start.toISOString()}&enddt=${end.toISOString()}&body=${encodeURIComponent(description)}&location=${encodeURIComponent(location)}`
   
   // Decidir qual calendário usar baseado no dispositivo
-  if (isIOS || isMac) {
-    // iOS/Mac - usar Apple Calendar
-    window.location.href = appleUrl
+  if (isIOS) {
+    // iOS - tentar múltiplas abordagens
+    try {
+      // Primeiro, tentar Google Calendar
+      const googleLink = document.createElement('a')
+      googleLink.href = googleUrl
+      googleLink.target = '_blank'
+      googleLink.rel = 'noopener noreferrer'
+      document.body.appendChild(googleLink)
+      googleLink.click()
+      document.body.removeChild(googleLink)
+    } catch (error) {
+      // Fallback: baixar arquivo ICS
+      const link = document.createElement('a')
+      link.href = icsUrl
+      link.download = `${title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.ics`
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      URL.revokeObjectURL(icsUrl)
+    }
+  } else if (isMac && isSafari) {
+    // Mac Safari - tentar Apple Calendar via ICS
+    const link = document.createElement('a')
+    link.href = icsUrl
+    link.download = `${title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.ics`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    URL.revokeObjectURL(icsUrl)
   } else if (isAndroid) {
-    // Android - tentar Google Calendar primeiro
+    // Android - usar Google Calendar
     window.open(googleUrl, '_blank')
   } else {
-    // Desktop - mostrar opções ou usar Google Calendar
-    const choice = confirm('Escolha o calendário:\n\nOK = Google Calendar\nCancelar = Outlook')
+    // Desktop - mostrar opções
+    const choice = confirm('Escolha o calendário:\n\nOK = Google Calendar\nCancelar = Baixar arquivo ICS')
     if (choice) {
       window.open(googleUrl, '_blank')
     } else {
-      window.open(outlookUrl, '_blank')
+      // Baixar arquivo ICS
+      const link = document.createElement('a')
+      link.href = icsUrl
+      link.download = `${title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.ics`
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      URL.revokeObjectURL(icsUrl)
     }
   }
 }

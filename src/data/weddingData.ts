@@ -12,7 +12,7 @@ export const weddingData: WeddingData = {
       hora: "15:30",
       local_resumo: "São Mateus - ES",
       endereco_completo: "Estrada do Nativo KM 1,4, Liberdade, São Mateus - ES, 29938-310",
-      google_maps_link: "https://www.google.com/maps/place/Estrada+do+Nativo,+KM+1,4+-+Liberdade,+S%C3%A3o+Mateus+-+ES,+29938-310/@-18.7168,-39.8581,17z/data=!3m1!4b1!4m6!3m5!1s0x0:0x0!7e2!8m2!3d-18.7168!4d-39.8581",
+      google_maps_link: "https://www.google.com/maps/search/?api=1&query=Estrada+do+Nativo+KM+1,4+Liberdade+São+Mateus+ES+29938-310",
       ics_texto_local: "Cerimonial Valle Verde"
     },
     video_convite: {

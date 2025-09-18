@@ -27,7 +27,9 @@ export default function VideoPage() {
       console.log('VideoPage - Carregando vídeo...')
       console.log('VideoPage - localStorage disponível:', typeof window !== 'undefined')
       
-      // Verificar diretamente no localStorage
+      // Primeiro, tentar carregar vídeo do admin (localStorage)
+      let adminVideoUrl = null
+      
       if (typeof window !== 'undefined') {
         const stored = localStorage.getItem('wedding-video-data')
         console.log('VideoPage - Dados brutos do localStorage:', stored ? 'ENCONTRADO' : 'VAZIO')
@@ -40,6 +42,9 @@ export default function VideoPage() {
               hasUrl: !!parsed?.url,
               urlLength: parsed?.url?.length
             })
+            if (parsed?.url) {
+              adminVideoUrl = parsed.url
+            }
           } catch (e) {
             console.error('VideoPage - Erro ao fazer parse:', e)
           }
@@ -50,11 +55,16 @@ export default function VideoPage() {
       console.log('VideoPage - Vídeo atual do videoStorage:', currentVideo)
       
       if (currentVideo && currentVideo.url) {
-        console.log('VideoPage - Definindo adminVideo:', currentVideo.url.substring(0, 50) + '...')
-        setAdminVideo(currentVideo.url)
+        adminVideoUrl = currentVideo.url
+      }
+      
+      if (adminVideoUrl) {
+        console.log('VideoPage - Usando vídeo do admin:', adminVideoUrl.substring(0, 50) + '...')
+        setAdminVideo(adminVideoUrl)
       } else {
-        console.log('VideoPage - Nenhum vídeo encontrado')
-        setAdminVideo(null)
+        console.log('VideoPage - Nenhum vídeo do admin encontrado, usando vídeo padrão')
+        // Usar vídeo padrão da pasta pública
+        setAdminVideo('/video-convite.mp4')
       }
     }
 
@@ -176,7 +186,7 @@ export default function VideoPage() {
           className="relative w-full max-w-sm mx-auto mb-8"
         >
           {adminVideo ? (
-            // Vídeo carregado pelo admin tem prioridade absoluta
+            // Vídeo carregado pelo admin ou vídeo padrão
             <div className="relative bg-black rounded-xl overflow-hidden shadow-2xl">
               <video
                 ref={videoRef}

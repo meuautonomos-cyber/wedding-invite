@@ -32,7 +32,13 @@ export class WhatsAppAutoService {
     const instanceId = process.env.NEXT_PUBLIC_ZAPI_INSTANCE_ID || ''
     this.zApiUrl = `https://api.z-api.io/instances/${instanceId}/token/${this.zApiToken}/send-text`
     
-    // Configuração do WhatsAppAutoService
+    // Debug das configurações
+    console.log('🔧 WhatsAppAutoService Config:', {
+      baseUrl: this.baseUrl,
+      zApiToken: this.zApiToken ? '***' + this.zApiToken.slice(-4) : 'VAZIO',
+      instanceId: instanceId ? '***' + instanceId.slice(-4) : 'VAZIO',
+      zApiUrl: this.zApiUrl
+    })
   }
 
   // Lista de presentes com valores e prioridades
@@ -365,6 +371,13 @@ export class WhatsAppAutoService {
       
       // ENVIO AUTOMÁTICO via Z-API
       const clientToken = process.env.NEXT_PUBLIC_ZAPI_CLIENT_TOKEN || ''
+      console.log('🔧 Debug Z-API:', {
+        url: this.zApiUrl,
+        clientToken: clientToken ? '***' + clientToken.slice(-4) : 'VAZIO',
+        phone: `55${data.telefone}`,
+        messageLength: message.length
+      })
+      
       const response = await fetch(this.zApiUrl, {
         method: 'POST',
         headers: {
@@ -378,10 +391,11 @@ export class WhatsAppAutoService {
       })
       
       if (response.ok) {
+        console.log('✅ Mensagem enviada com sucesso via Z-API')
         return true
       } else {
         const errorText = await response.text()
-        console.error('Erro ao enviar via Z-API:', response.status, errorText)
+        console.error('❌ Erro ao enviar via Z-API:', response.status, errorText)
         return false
       }
       
@@ -395,7 +409,16 @@ export class WhatsAppAutoService {
   async testConnection(): Promise<boolean> {
     try {
       const clientToken = process.env.NEXT_PUBLIC_ZAPI_CLIENT_TOKEN || ''
-      const response = await fetch(`https://api.z-api.io/instances/${process.env.NEXT_PUBLIC_ZAPI_INSTANCE_ID}/token/${this.zApiToken}/status`, {
+      const instanceId = process.env.NEXT_PUBLIC_ZAPI_INSTANCE_ID || ''
+      const statusUrl = `https://api.z-api.io/instances/${instanceId}/token/${this.zApiToken}/status`
+      
+      console.log('🔧 Debug Test Connection:', {
+        url: statusUrl,
+        clientToken: clientToken ? '***' + clientToken.slice(-4) : 'VAZIO',
+        instanceId: instanceId ? '***' + instanceId.slice(-4) : 'VAZIO'
+      })
+      
+      const response = await fetch(statusUrl, {
         method: 'GET',
         headers: {
           'Client-Token': clientToken
@@ -403,9 +426,10 @@ export class WhatsAppAutoService {
       })
       
       if (response.ok) {
+        console.log('✅ Conexão Z-API OK')
         return true
       } else {
-        console.error('Erro na conexão Z-API:', response.status)
+        console.error('❌ Erro na conexão Z-API:', response.status)
         return false
       }
     } catch (error) {

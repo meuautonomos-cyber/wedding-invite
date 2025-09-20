@@ -5,7 +5,6 @@ import { motion } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import { weddingData } from '@/data/weddingData'
 import { supabaseStorage, TicketData, RSVPData } from '@/lib/supabaseStorage'
-import { whatsappService } from '@/lib/whatsappService'
 import { 
   ArrowLeftIcon,
   CheckCircleIcon,

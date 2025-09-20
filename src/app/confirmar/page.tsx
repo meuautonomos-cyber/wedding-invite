@@ -113,7 +113,6 @@ export default function ConfirmarPage() {
             },
             body: JSON.stringify({
               to: `55${formData.telefone}`,
-              message: whatsappMessage.message || '',
               ticketId: ticket.id,
               nome: formData.nome,
               status: formData.status,

@@ -17,14 +17,9 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-wedding-cream relative overflow-hidden page-container">
-      {/* Layout principal como imagem de fundo */}
+      {/* Fundo principal */}
       <div
-        className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
-        style={{
-          backgroundImage: 'url("/images/layout-principal.png")',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center top'
-        }}
+        className="absolute inset-0 w-full h-full bg-gradient-to-br from-wedding-cream via-wedding-cream/95 to-wedding-sage/10"
         aria-hidden="true"
       />
 

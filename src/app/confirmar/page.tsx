@@ -94,17 +94,6 @@ export default function ConfirmarPage() {
       // Enviar WhatsApp automaticamente APENAS se confirmar presença
       if (formData.status !== 'nao_podera_ir') {
         try {
-          // Carregar número do WhatsApp salvo
-          const whatsappMessage = {
-            nome: formData.nome,
-            telefone: formData.telefone,
-            status: formData.status === 'com_acompanhante' ? 'com_acompanhante' : 'confirmado',
-            acompanhante: formData.status === 'com_acompanhante' ? formData.observacoes : undefined,
-            observacoes: formData.restricoes_alimentares || formData.observacoes || '',
-            ticketId: ticket.id,
-            restricoes_alimentares: formData.restricoes_alimentares
-          }
-          
           // ENVIO 100% AUTOMÁTICO via API
           const response = await fetch('/api/whatsapp/send', {
             method: 'POST',

@@ -30,7 +30,6 @@ export class WhatsAppAutoService {
     // Token do Z-API (você precisa obter em https://z-api.io)
     this.zApiToken = process.env.NEXT_PUBLIC_ZAPI_TOKEN || ''
     const instanceId = process.env.NEXT_PUBLIC_ZAPI_INSTANCE_ID || ''
-    const clientToken = process.env.NEXT_PUBLIC_ZAPI_CLIENT_TOKEN || ''
     this.zApiUrl = `https://api.z-api.io/instances/${instanceId}/token/${this.zApiToken}/send-text`
     
     // Configuração do WhatsAppAutoService
@@ -230,8 +229,8 @@ export class WhatsAppAutoService {
       return suggestions.map(suggestion => ({
         nome: suggestion.presente_nome,
         link: suggestion.presente_link,
-        valor: suggestion.presente_valor,
-        categoria: suggestion.presente_categoria,
+        valor: suggestion.presente_valor || 0,
+        categoria: suggestion.presente_categoria || '',
         prioridade: suggestion.prioridade
       }))
     } catch (error) {
@@ -306,19 +305,13 @@ export class WhatsAppAutoService {
     
     if (suggestedPresentes.length > 0) {
       const presente = suggestedPresentes[0] // Pegar apenas o primeiro (único)
-      const valorText = presente.valor ? `💰 R$ ${presente.valor.toFixed(2)}` : ''
-      const grupoText = presente.grupo ? ' 👥' : ''
-      
-      messageText += `🎁 *SUGESTÃO DE PRESENTE:*\n`
-      messageText += `Sua presença já é o maior presente, mas se desejar nos presentear:\n\n`
-      messageText += `*${presente.nome}*${grupoText}\n`
-      if (valorText) messageText += `${valorText}\n`
-      messageText += `🔗 ${presente.link}\n\n`
-      
-      // Se é sugestão de grupo, adicionar explicação
-      if (presente.grupo) {
-        messageText += `💡 *DICA:* Este presente pode ser comprado em grupo!\n`
-        messageText += `Entre em contato conosco para organizar a compra coletiva.\n\n`
+      if (presente) {
+        const valorText = presente.valor ? `💰 R$ ${presente.valor.toFixed(2)}` : ''
+        messageText += `🎁 *SUGESTÃO DE PRESENTE:*\n`
+        messageText += `Sua presença já é o maior presente, mas se desejar nos presentear:\n\n`
+        messageText += `*${presente.nome}*\n`
+        if (valorText) messageText += `${valorText}\n`
+        messageText += `🔗 ${presente.link}\n\n`
       }
     } else {
       messageText += `🎁 *LISTA DE PRESENTES:*\n`
@@ -385,7 +378,6 @@ export class WhatsAppAutoService {
       })
       
       if (response.ok) {
-        const result = await response.json()
         return true
       } else {
         const errorText = await response.text()

@@ -29,11 +29,11 @@ export default function SitePage() {
 
   const handleTouchStart = (e: React.TouchEvent) => {
     setTouchEnd(null)
-    setTouchStart(e.targetTouches[0].clientX)
+    setTouchStart(e.targetTouches[0]?.clientX || null)
   }
 
   const handleTouchMove = (e: React.TouchEvent) => {
-    setTouchEnd(e.targetTouches[0].clientX)
+    setTouchEnd(e.targetTouches[0]?.clientX || null)
   }
 
   const handleTouchEnd = () => {
@@ -79,13 +79,7 @@ export default function SitePage() {
     }
   ]
 
-  const nextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % valleVerdeImages.length)
-  }
 
-  const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + valleVerdeImages.length) % valleVerdeImages.length)
-  }
 
   return (
     <div className="min-h-screen bg-wedding-cream-50 relative z-0">

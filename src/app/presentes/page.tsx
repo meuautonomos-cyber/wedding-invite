@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import { weddingData } from '@/data/weddingData'
-import { supabaseStorage, GiftData } from '@/lib/supabaseStorage'
+import { supabaseStorage } from '@/lib/supabaseStorage'
 import { 
   ArrowLeftIcon,
   GiftIcon,
@@ -107,20 +107,20 @@ export default function PresentesPage() {
     
     try {
       // Preparar dados do presente
-      const giftData: Omit<GiftData, 'id' | 'data_presente'> = {
+      const giftData = {
         doador_nome: doadorInfo.nome,
         doador_telefone: doadorInfo.telefone,
-        doador_email: doadorInfo.email || undefined,
+        doador_email: doadorInfo.email,
         tipo: selectedCota ? 'cota' : 'pix',
-        valor: selectedCota || undefined,
+        valor: selectedCota ?? undefined,
         item_nome: selectedCota ? `Cota ${categories.find(c => c.id === selectedCategory)?.name}` : undefined,
         categoria: selectedCategory,
-        mensagem: doadorInfo.mensagem || undefined,
-        status: 'pendente'
+        mensagem: doadorInfo.mensagem,
+        status: 'pendente' as const
       }
 
       // Salvar no Supabase
-      await supabaseStorage.createGift(giftData)
+      await supabaseStorage.createGift(giftData as any)
       
       console.log('Presente registrado com sucesso:', giftData)
       

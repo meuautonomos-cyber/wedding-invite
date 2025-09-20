@@ -139,8 +139,8 @@ async function sendWhatsAppMessage(data, userAgent) {
     message += `* Código do ingresso: ${data.ticketId}\n`
     message += `* Seu ingresso personalizado: https://eclectic-biscochitos-4c5969.netlify.app/ingresso?id=${data.ticketId}\n\n`
     
-    // Adicionar sugestão de presente
-    const presenteSugerido = getSuggestedPresente()
+    // Adicionar sugestão de presente inteligente
+    const presenteSugerido = getSmartPresenteSuggestion(userAgent)
     message += `🎁 *SUGESTÃO DE PRESENTE:*\n`
     message += `Sua presença já é o maior presente, mas se desejar nos presentear:\n\n`
     message += `${presenteSugerido.nome}\n`
@@ -194,52 +194,138 @@ function generateQRCode(ticketId) {
   return result
 }
 
-// Função para sugerir presente aleatório
-function getSuggestedPresente() {
+// Função para detectar iPhone
+function detectIPhone(userAgent) {
+  return /iPhone|iPad|iPod/i.test(userAgent || '')
+}
+
+// Função para detectar Android
+function detectAndroid(userAgent) {
+  return /Android/i.test(userAgent || '')
+}
+
+// Função para sugerir presente inteligente baseado no dispositivo
+function getSmartPresenteSuggestion(userAgent) {
   const presentes = [
-    { nome: "Jogo de panelas antiaderentes/inox", valor: 150.00, link: "https://mercadolivre.com/sec/2usVbzq" },
-    { nome: "Conjunto de facas", valor: 80.00, link: "https://mercadolivre.com/sec/19LNmft" },
-    { nome: "Liquidificador", valor: 120.00, link: "https://mercadolivre.com/sec/1SoRVx2" },
-    { nome: "Batedeira", valor: 100.00, link: "https://mercadolivre.com/sec/2frVCiG" },
-    { nome: "Mixer 3 em 1", valor: 90.00, link: "https://mercadolivre.com/sec/1JScTpa" },
-    { nome: "Torradeira", valor: 60.00, link: "https://mercadolivre.com/sec/2RJhMuX" },
-    { nome: "Sanduicheira/grill", valor: 70.00, link: "https://mercadolivre.com/sec/19tYLWx" },
-    { nome: "Fritadeira sem óleo (Airfryer)", valor: 200.00, link: "https://mercadolivre.com/sec/1jDdXWD" },
-    { nome: "Panela elétrica de arroz", valor: 110.00, link: "https://mercadolivre.com/sec/2MXn8XZ" },
-    { nome: "Conjunto de travessas de vidro/cerâmica", valor: 85.00, link: "https://mercadolivre.com/sec/26av8p9" },
-    { nome: "Jogo de pratos", valor: 75.00, link: "https://mercadolivre.com/sec/15kfbN3" },
-    { nome: "Jogo de Talheres", valor: 65.00, link: "https://mercadolivre.com/sec/1VpEqxE" },
-    { nome: "Conjunto de copos", valor: 55.00, link: "https://mercadolivre.com/sec/1bwH3eF" },
-    { nome: "Jogo de potes herméticos para mantimentos", valor: 95.00, link: "https://mercadolivre.com/sec/2P9bHYg" },
-    { nome: "Conjunto de formas para bolo e assadeira", valor: 80.00, link: "https://mercadolivre.com/sec/2rfXnPM" },
-    { nome: "Jogo de cama (lençóis, fronhas, edredom)", valor: 180.00, link: "https://mercadolivre.com/sec/2NXLpcs" },
-    { nome: "Colcha ou cobre-leito", valor: 120.00, link: "https://mercadolivre.com/sec/2Pk99ys" },
-    { nome: "Travesseiros", valor: 70.00, link: "https://mercadolivre.com/sec/1piNg8B" },
-    { nome: "Almofadas decorativas", valor: 50.00, link: "https://mercadolivre.com/sec/16vMCgZ" },
-    { nome: "Manta aconchegante", valor: 90.00, link: "https://mercadolivre.com/sec/1B8XRBh" },
-    { nome: "Kit organizadores de guarda-roupa", valor: 110.00, link: "https://mercadolivre.com/sec/23LXFht" },
-    { nome: "Jogo de Toalhas", valor: 85.00, link: "https://mercadolivre.com/sec/14QL9NG" },
-    { nome: "Roupões de casal", valor: 130.00, link: "https://mercadolivre.com/sec/27xRcLL" },
-    { nome: "Tapetes antiderrapantes", valor: 60.00, link: "https://mercadolivre.com/sec/1FKWkrJ" },
-    { nome: "Kit de higiene (porta-sabonete, escova, etc.)", valor: 45.00, link: "https://mercadolivre.com/sec/2MNDEoL" },
-    { nome: "Jogo Tapete Cozinha", valor: 40.00, link: "https://mercadolivre.com/sec/1AeuNjb" },
-    { nome: "Cortinas", valor: 100.00, link: "https://mercadolivre.com/sec/1CwNdqD" },
-    { nome: "Estante para Livros", valor: 150.00, link: "https://mercadolivre.com/sec/1tnwT39" },
-    { nome: "Micro-Ondas", valor: 250.00, link: "https://mercadolivre.com/sec/2gGDJiH" },
-    { nome: "Aspirador de Pó Vertical", valor: 200.00, link: "https://mercadolivre.com/sec/18fYNWW" },
-    { nome: "Robô Aspirador de Pó", valor: 400.00, link: "https://mercadolivre.com/sec/1pdsqFp" },
-    { nome: "Ventilador", valor: 80.00, link: "https://mercadolivre.com/sec/2GYR7oM" },
-    { nome: "Smart Tv", valor: 800.00, link: "https://mercadolivre.com/sec/1jaff8k" },
-    { nome: "Ferro de Passar", valor: 70.00, link: "https://mercadolivre.com/sec/1NdYDhp" },
-    { nome: "Maquina de Lavar", valor: 600.00, link: "https://mercadolivre.com/sec/32siZuq" },
-    { nome: "Jogo Americano", valor: 30.00, link: "https://mercadolivre.com/sec/2sytDNj" },
-    { nome: "Sousplat", valor: 15.00, link: "https://mercadolivre.com/sec/2xcp8oD" },
-    { nome: "Jarra de suco/água", valor: 35.00, link: "https://mercadolivre.com/sec/1j4AAFa" },
-    { nome: "Garrafa térmica para café/chá", valor: 45.00, link: "https://mercadolivre.com/sec/1k75wCy" },
-    { nome: "Jogo de Xicaras", valor: 55.00, link: "https://mercadolivre.com/sec/28yi7aT" }
+    // ELETRODOMÉSTICOS CAROS (Prioridade 1)
+    { nome: "Smart Tv", link: "https://mercadolivre.com/sec/1jaff8k", categoria: "Eletrodomésticos", valor: 800.00, prioridade: 1 },
+    { nome: "Maquina de Lavar", link: "https://mercadolivre.com/sec/32siZuq", categoria: "Eletrodomésticos", valor: 600.00, prioridade: 1 },
+    { nome: "Robô Aspirador de Pó", link: "https://mercadolivre.com/sec/1pdsqFp", categoria: "Eletrodomésticos", valor: 400.00, prioridade: 1 },
+    { nome: "Aspirador de Pó Vertical", link: "https://mercadolivre.com/sec/18fYNWW", categoria: "Eletrodomésticos", valor: 200.00, prioridade: 1 },
+    { nome: "Micro-Ondas", link: "https://mercadolivre.com/sec/2gGDJiH", categoria: "Eletrodomésticos", valor: 250.00, prioridade: 1 },
+    
+    // COZINHA CARA (Prioridade 2)
+    { nome: "Fritadeira sem óleo (Airfryer)", link: "https://mercadolivre.com/sec/1jDdXWD", categoria: "Cozinha", valor: 200.00, prioridade: 2 },
+    { nome: "Jogo de panelas antiaderentes/inox", link: "https://mercadolivre.com/sec/2usVbzq", categoria: "Cozinha", valor: 150.00, prioridade: 2 },
+    { nome: "Conjunto de travessas de vidro/cerâmica", link: "https://mercadolivre.com/sec/26av8p9", categoria: "Mesa", valor: 85.00, prioridade: 2 },
+    { nome: "Jogo de cama (lençóis, fronhas, edredom)", link: "https://mercadolivre.com/sec/2NXLpcs", categoria: "Quarto", valor: 180.00, prioridade: 2 },
+    
+    // COZINHA MÉDIA (Prioridade 3)
+    { nome: "Batedeira", link: "https://mercadolivre.com/sec/2frVCiG", categoria: "Cozinha", valor: 100.00, prioridade: 3 },
+    { nome: "Liquidificador", link: "https://mercadolivre.com/sec/1SoRVx2", categoria: "Cozinha", valor: 120.00, prioridade: 3 },
+    { nome: "Mixer 3 em 1", link: "https://mercadolivre.com/sec/1JScTpa", categoria: "Cozinha", valor: 90.00, prioridade: 3 },
+    { nome: "Panela elétrica de arroz", link: "https://mercadolivre.com/sec/2MXn8XZ", categoria: "Cozinha", valor: 110.00, prioridade: 3 },
+    { nome: "Conjunto de formas para bolo e assadeira", link: "https://mercadolivre.com/sec/2rfXnPM", categoria: "Cozinha", valor: 80.00, prioridade: 3 },
+    
+    // MESA E DECORAÇÃO (Prioridade 4)
+    { nome: "Jogo de pratos", link: "https://mercadolivre.com/sec/15kfbN3", categoria: "Mesa", valor: 75.00, prioridade: 4 },
+    { nome: "Jogo de Talheres", link: "https://mercadolivre.com/sec/1VpEqxE", categoria: "Mesa", valor: 65.00, prioridade: 4 },
+    { nome: "Conjunto de copos", link: "https://mercadolivre.com/sec/1bwH3eF", categoria: "Mesa", valor: 55.00, prioridade: 4 },
+    { nome: "Colcha ou cobre-leito", link: "https://mercadolivre.com/sec/2Pk99ys", categoria: "Quarto", valor: 120.00, prioridade: 4 },
+    { nome: "Travesseiros", link: "https://mercadolivre.com/sec/1piNg8B", categoria: "Quarto", valor: 70.00, prioridade: 4 },
+    { nome: "Cortinas", link: "https://mercadolivre.com/sec/1CwNdqD", categoria: "Decoração", valor: 100.00, prioridade: 4 },
+    { nome: "Estante para Livros", link: "https://mercadolivre.com/sec/1tnwT39", categoria: "Sala", valor: 150.00, prioridade: 4 },
+    
+    // COZINHA BÁSICA (Prioridade 5)
+    { nome: "Torradeira", link: "https://mercadolivre.com/sec/2RJhMuX", categoria: "Cozinha", valor: 60.00, prioridade: 5 },
+    { nome: "Sanduicheira/grill", link: "https://mercadolivre.com/sec/19tYLWx", categoria: "Cozinha", valor: 70.00, prioridade: 5 },
+    { nome: "Conjunto de facas", link: "https://mercadolivre.com/sec/19LNmft", categoria: "Cozinha", valor: 80.00, prioridade: 5 },
+    { nome: "Jogo de potes herméticos para mantimentos", link: "https://mercadolivre.com/sec/2P9bHYg", categoria: "Cozinha", valor: 95.00, prioridade: 5 },
+    { nome: "Jogo Tapete Cozinha", link: "https://mercadolivre.com/sec/1AeuNjb", categoria: "Cozinha", valor: 40.00, prioridade: 5 },
+    
+    // BANHEIRO E ORGANIZAÇÃO (Prioridade 6)
+    { nome: "Jogo de Toalhas", link: "https://mercadolivre.com/sec/14QL9NG", categoria: "Banheiro", valor: 85.00, prioridade: 6 },
+    { nome: "Roupões de casal", link: "https://mercadolivre.com/sec/27xRcLL", categoria: "Banheiro", valor: 130.00, prioridade: 6 },
+    { nome: "Kit de higiene (porta-sabonete, escova, etc.)", link: "https://mercadolivre.com/sec/2MNDEoL", categoria: "Banheiro", valor: 45.00, prioridade: 6 },
+    { nome: "Kit organizadores de guarda-roupa", link: "https://mercadolivre.com/sec/23LXFht", categoria: "Organização", valor: 110.00, prioridade: 6 },
+    
+    // DECORAÇÃO E ACESSÓRIOS (Prioridade 7)
+    { nome: "Almofadas decorativas", link: "https://mercadolivre.com/sec/16vMCgZ", categoria: "Decoração", valor: 50.00, prioridade: 7 },
+    { nome: "Manta aconchegante", link: "https://mercadolivre.com/sec/1B8XRBh", categoria: "Decoração", valor: 90.00, prioridade: 7 },
+    { nome: "Tapetes antiderrapantes", link: "https://mercadolivre.com/sec/1FKWkrJ", categoria: "Decoração", valor: 60.00, prioridade: 7 },
+    
+    // ACESSÓRIOS BÁSICOS (Prioridade 8)
+    { nome: "Jogo Americano", link: "https://mercadolivre.com/sec/2sytDNj", categoria: "Mesa", valor: 30.00, prioridade: 8 },
+    { nome: "Sousplat", link: "https://mercadolivre.com/sec/2xcp8oD", categoria: "Mesa", valor: 15.00, prioridade: 8 },
+    { nome: "Jarra de suco/água", link: "https://mercadolivre.com/sec/1j4AAFa", categoria: "Cozinha", valor: 35.00, prioridade: 8 },
+    { nome: "Garrafa térmica para café/chá", link: "https://mercadolivre.com/sec/1k75wCy", categoria: "Cozinha", valor: 45.00, prioridade: 8 },
+    { nome: "Jogo de Xicaras", link: "https://mercadolivre.com/sec/28yi7aT", categoria: "Mesa", valor: 55.00, prioridade: 8 },
+    
+    // ELETRODOMÉSTICOS BÁSICOS (Prioridade 9)
+    { nome: "Ventilador", link: "https://mercadolivre.com/sec/2GYR7oM", categoria: "Eletrodomésticos", valor: 80.00, prioridade: 9 },
+    { nome: "Ferro de Passar", link: "https://mercadolivre.com/sec/1NdYDhp", categoria: "Eletrodomésticos", valor: 70.00, prioridade: 9 }
   ]
   
-  // Selecionar presente aleatório
+  // Detectar tipo de dispositivo
+  const isIPhone = detectIPhone(userAgent)
+  const isAndroid = detectAndroid(userAgent)
+  
+  console.log(`📱 Dispositivo detectado: ${isIPhone ? 'iPhone' : isAndroid ? 'Android' : 'Outro'}`)
+  
+  // Separar presentes por faixas de preço
+  const caros = presentes.filter(p => (p.prioridade || 9) <= 3) // Prioridade 1-3
+  const medios = presentes.filter(p => (p.prioridade || 9) >= 4 && (p.prioridade || 9) <= 6) // Prioridade 4-6
+  const baratos = presentes.filter(p => (p.prioridade || 9) >= 7) // Prioridade 7-9
+  
+  let selectedPresentes = []
+  
+  if (isIPhone) {
+    // iPhone: 70% caros, 30% baratos
+    const random = Math.random()
+    if (random < 0.7 && caros.length > 0) {
+      selectedPresentes = caros.sort((a, b) => (b.valor || 0) - (a.valor || 0))
+      console.log(`🍎 iPhone: Sugerindo presente CARO (70% chance)`)
+    } else if (baratos.length > 0) {
+      selectedPresentes = baratos.sort((a, b) => (a.valor || 0) - (b.valor || 0))
+      console.log(`🍎 iPhone: Sugerindo presente BARATO (30% chance)`)
+    } else if (medios.length > 0) {
+      selectedPresentes = medios.sort((a, b) => (b.valor || 0) - (a.valor || 0))
+      console.log(`🍎 iPhone: Fallback para MÉDIO`)
+    }
+  } else if (isAndroid) {
+    // Android: 70% baratos, 30% caros
+    const random = Math.random()
+    if (random < 0.7 && baratos.length > 0) {
+      selectedPresentes = baratos.sort((a, b) => (a.valor || 0) - (b.valor || 0))
+      console.log(`🤖 Android: Sugerindo presente BARATO (70% chance)`)
+    } else if (caros.length > 0) {
+      selectedPresentes = caros.sort((a, b) => (b.valor || 0) - (a.valor || 0))
+      console.log(`🤖 Android: Sugerindo presente CARO (30% chance)`)
+    } else if (medios.length > 0) {
+      selectedPresentes = medios.sort((a, b) => (b.valor || 0) - (a.valor || 0))
+      console.log(`🤖 Android: Fallback para MÉDIO`)
+    }
+  } else {
+    // Outros dispositivos: 50% médios, 25% caros, 25% baratos
+    const random = Math.random()
+    if (random < 0.5 && medios.length > 0) {
+      selectedPresentes = medios.sort((a, b) => (b.valor || 0) - (a.valor || 0))
+      console.log(`💻 Outro: Sugerindo presente MÉDIO (50% chance)`)
+    } else if (random < 0.75 && caros.length > 0) {
+      selectedPresentes = caros.sort((a, b) => (b.valor || 0) - (a.valor || 0))
+      console.log(`💻 Outro: Sugerindo presente CARO (25% chance)`)
+    } else if (baratos.length > 0) {
+      selectedPresentes = baratos.sort((a, b) => (a.valor || 0) - (b.valor || 0))
+      console.log(`💻 Outro: Sugerindo presente BARATO (25% chance)`)
+    }
+  }
+  
+  // Selecionar o primeiro da lista (mais prioritário)
+  if (selectedPresentes.length > 0) {
+    return selectedPresentes[0]
+  }
+  
+  // Fallback: selecionar aleatório
   const randomIndex = Math.floor(Math.random() * presentes.length)
   return presentes[randomIndex]
 }

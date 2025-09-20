@@ -29,11 +29,46 @@ CREATE TABLE IF NOT EXISTS wedding_tickets (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
+-- Tabela para armazenar presentes recebidos
+CREATE TABLE IF NOT EXISTS wedding_gifts (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    doador_nome VARCHAR(255) NOT NULL,
+    doador_telefone VARCHAR(20) NOT NULL,
+    doador_email VARCHAR(255),
+    tipo VARCHAR(20) NOT NULL CHECK (tipo IN ('cota', 'item', 'pix')),
+    valor DECIMAL(10,2),
+    item_nome VARCHAR(255),
+    categoria VARCHAR(50),
+    mensagem TEXT,
+    status VARCHAR(20) DEFAULT 'pendente' CHECK (status IN ('pendente', 'confirmado', 'entregue')),
+    data_presente TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Tabela para controlar sugestões de presentes por ticket
+CREATE TABLE IF NOT EXISTS wedding_presente_suggestions (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    ticket_id VARCHAR(50) NOT NULL,
+    presente_nome VARCHAR(255) NOT NULL,
+    presente_link TEXT NOT NULL,
+    presente_valor DECIMAL(10,2),
+    presente_categoria VARCHAR(50),
+    prioridade INTEGER DEFAULT 9,
+    sugerido_em TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
 -- Índices para melhor performance
 CREATE INDEX IF NOT EXISTS idx_wedding_rsvp_email ON wedding_rsvp(email);
 CREATE INDEX IF NOT EXISTS idx_wedding_rsvp_status ON wedding_rsvp(status);
 CREATE INDEX IF NOT EXISTS idx_wedding_tickets_email ON wedding_tickets(email);
 CREATE INDEX IF NOT EXISTS idx_wedding_tickets_status ON wedding_tickets(status);
+CREATE INDEX IF NOT EXISTS idx_wedding_gifts_doador_email ON wedding_gifts(doador_email);
+CREATE INDEX IF NOT EXISTS idx_wedding_gifts_status ON wedding_gifts(status);
+CREATE INDEX IF NOT EXISTS idx_wedding_gifts_tipo ON wedding_gifts(tipo);
+CREATE INDEX IF NOT EXISTS idx_wedding_presente_suggestions_ticket_id ON wedding_presente_suggestions(ticket_id);
+CREATE INDEX IF NOT EXISTS idx_wedding_presente_suggestions_presente_nome ON wedding_presente_suggestions(presente_nome);
 
 -- Função para atualizar updated_at automaticamente
 CREATE OR REPLACE FUNCTION update_updated_at_column()
@@ -53,9 +88,15 @@ CREATE TRIGGER update_wedding_tickets_updated_at
     BEFORE UPDATE ON wedding_tickets 
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+CREATE TRIGGER update_wedding_gifts_updated_at 
+    BEFORE UPDATE ON wedding_gifts 
+    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
 -- Políticas de segurança (RLS)
 ALTER TABLE wedding_rsvp ENABLE ROW LEVEL SECURITY;
 ALTER TABLE wedding_tickets ENABLE ROW LEVEL SECURITY;
+ALTER TABLE wedding_gifts ENABLE ROW LEVEL SECURITY;
+ALTER TABLE wedding_presente_suggestions ENABLE ROW LEVEL SECURITY;
 
 -- Política para permitir inserção de novos RSVPs
 CREATE POLICY "Permitir inserção de RSVP" ON wedding_rsvp
@@ -75,4 +116,24 @@ CREATE POLICY "Permitir leitura de ingressos" ON wedding_tickets
 
 -- Política para permitir atualização de ingressos
 CREATE POLICY "Permitir atualização de ingressos" ON wedding_tickets
+    FOR UPDATE USING (true);
+
+-- Políticas para presentes
+CREATE POLICY "Permitir inserção de presentes" ON wedding_gifts
+    FOR INSERT WITH CHECK (true);
+
+CREATE POLICY "Permitir leitura de presentes" ON wedding_gifts
+    FOR SELECT USING (true);
+
+CREATE POLICY "Permitir atualização de presentes" ON wedding_gifts
+    FOR UPDATE USING (true);
+
+-- Políticas para sugestões de presentes
+CREATE POLICY "Permitir inserção de sugestões de presentes" ON wedding_presente_suggestions
+    FOR INSERT WITH CHECK (true);
+
+CREATE POLICY "Permitir leitura de sugestões de presentes" ON wedding_presente_suggestions
+    FOR SELECT USING (true);
+
+CREATE POLICY "Permitir atualização de sugestões de presentes" ON wedding_presente_suggestions
     FOR UPDATE USING (true);

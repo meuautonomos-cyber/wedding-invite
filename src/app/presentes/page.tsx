@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import { weddingData } from '@/data/weddingData'
+import { supabaseStorage, GiftData } from '@/lib/supabaseStorage'
 import { 
   ArrowLeftIcon,
   GiftIcon,
@@ -104,17 +105,33 @@ export default function PresentesPage() {
   const handlePresenteSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
-    // Aqui você faria a integração com o backend para salvar o presente
-    // Por enquanto, apenas simulamos o sucesso
-    console.log('Presente registrado:', {
-      tipo: selectedCota ? 'cota' : 'pix',
-      valor: selectedCota,
-      doador: doadorInfo
-    })
-    
-    setShowSuccessModal(true)
-    setDoadorInfo({ nome: '', telefone: '', email: '', mensagem: '' })
-    setSelectedCota(null)
+    try {
+      // Preparar dados do presente
+      const giftData: Omit<GiftData, 'id' | 'data_presente'> = {
+        doador_nome: doadorInfo.nome,
+        doador_telefone: doadorInfo.telefone,
+        doador_email: doadorInfo.email || undefined,
+        tipo: selectedCota ? 'cota' : 'pix',
+        valor: selectedCota || undefined,
+        item_nome: selectedCota ? `Cota ${categories.find(c => c.id === selectedCategory)?.name}` : undefined,
+        categoria: selectedCategory,
+        mensagem: doadorInfo.mensagem || undefined,
+        status: 'pendente'
+      }
+
+      // Salvar no Supabase
+      await supabaseStorage.createGift(giftData)
+      
+      console.log('Presente registrado com sucesso:', giftData)
+      
+      setShowSuccessModal(true)
+      setDoadorInfo({ nome: '', telefone: '', email: '', mensagem: '' })
+      setSelectedCota(null)
+      setCurrentStep(1) // Voltar ao início
+    } catch (error) {
+      console.error('Erro ao registrar presente:', error)
+      alert('Erro ao registrar presente. Tente novamente.')
+    }
   }
 
   const formatCurrency = (valor: number) => {

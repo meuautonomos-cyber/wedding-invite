@@ -20,13 +20,20 @@ interface PresenteItem {
   prioridade?: number
 }
 
-export class WhatsAppService {
-  private readonly whatsappNumber: string
+export class WhatsAppAutoService {
   private readonly baseUrl: string
+  private readonly zApiToken: string
+  private readonly zApiUrl: string
 
-  constructor(whatsappNumber: string, baseUrl: string = 'http://localhost:3000') {
-    this.whatsappNumber = whatsappNumber.replace(/\D/g, '')
+  constructor(baseUrl: string = 'http://localhost:3001') {
     this.baseUrl = baseUrl
+    // Token do Z-API (você precisa obter em https://z-api.io)
+    this.zApiToken = process.env.NEXT_PUBLIC_ZAPI_TOKEN || ''
+    const instanceId = process.env.NEXT_PUBLIC_ZAPI_INSTANCE_ID || ''
+    const clientToken = process.env.NEXT_PUBLIC_ZAPI_CLIENT_TOKEN || ''
+    this.zApiUrl = `https://api.z-api.io/instances/${instanceId}/token/${this.zApiToken}/send-text`
+    
+    // Configuração do WhatsAppAutoService
   }
 
   // Lista de presentes com valores e prioridades
@@ -81,7 +88,7 @@ export class WhatsAppService {
       
       // MESA E ACESSÓRIOS (Prioridade 8)
       { nome: "Jogo Americano", link: "https://mercadolivre.com/sec/2sytDNj", categoria: "Mesa", valor: 20, prioridade: 8 },
-      { nome: "Sousplat", link: "https://mercadolivre.com/sec/2xcp8oD", categoria: "Mesa", valor: 15, prioridade: 8 },
+      { nome: "Travessa de Porcelanato", link: "https://mercadolivre.com/sec/2xcp8oD", categoria: "Mesa", valor: 15, prioridade: 8 },
       { nome: "Jarra de suco/água", link: "https://mercadolivre.com/sec/1j4AAFa", categoria: "Mesa", valor: 25, prioridade: 8 },
       { nome: "Garrafa térmica para café/chá", link: "https://mercadolivre.com/sec/1k75wCy", categoria: "Mesa", valor: 30, prioridade: 8 },
       { nome: "Jogo de Xicaras", link: "https://mercadolivre.com/sec/28yi7aT", categoria: "Mesa", valor: 20, prioridade: 8 },
@@ -92,47 +99,110 @@ export class WhatsAppService {
     ]
   }
 
-  // Gerar QR Code para o ingresso
-  private async generateQRCode(ticketId: string): Promise<string> {
-    try {
-      const qrData = `${this.baseUrl}/ingresso?id=${ticketId}`
-      const qrCodeDataURL = await QRCode.toDataURL(qrData, {
-        width: 200,
-        margin: 2,
-        color: {
-          dark: '#000000',
-          light: '#FFFFFF'
-        }
-      })
-      return qrCodeDataURL
-    } catch (error) {
-      console.error('Erro ao gerar QR Code:', error)
-      return ''
+  // Detectar iPhone
+  private detectIPhone(userAgent?: string): boolean {
+    if (typeof window !== 'undefined' && !userAgent) {
+      userAgent = navigator.userAgent
     }
+    return /iPhone|iPad|iPod/i.test(userAgent || '')
   }
 
-  // Sistema inteligente de sugestão de presentes
-  private async getSmartPresenteSuggestions(ticketId: string): Promise<PresenteItem[]> {
+  // Detectar Android
+  private detectAndroid(userAgent?: string): boolean {
+    if (typeof window !== 'undefined' && !userAgent) {
+      userAgent = navigator.userAgent
+    }
+    return /Android/i.test(userAgent || '')
+  }
+
+  // Sistema inteligente de sugestão de presentes baseado no dispositivo
+  private async getSmartPresenteSuggestions(ticketId: string, userAgent?: string): Promise<PresenteItem[]> {
     try {
       // Buscar presentes já sugeridos para este ticket
       const suggestedPresentes = await this.getSuggestedPresentesForTicket(ticketId)
       
-      // Obter todos os presentes ordenados por prioridade
-      const allPresentes = this.getPresentesList().sort((a, b) => {
-        if (a.prioridade !== b.prioridade) {
-          return (a.prioridade || 9) - (b.prioridade || 9)
-        }
-        return (b.valor || 0) - (a.valor || 0)
-      })
+      // Se já tem sugestão para este ticket, retornar a existente
+      if (suggestedPresentes.length > 0) {
+        return suggestedPresentes
+      }
       
-      // Filtrar presentes já sugeridos
+      // Detectar tipo de dispositivo
+      const isIPhone = this.detectIPhone(userAgent)
+      const isAndroid = this.detectAndroid(userAgent)
+      
+      console.log(`📱 Dispositivo detectado: ${isIPhone ? 'iPhone' : isAndroid ? 'Android' : 'Outro'}`)
+      
+      // Obter todos os presentes
+      const allPresentes = this.getPresentesList()
+      
+      // Buscar todos os presentes já sugeridos globalmente
+      const allSuggestedPresentes = await supabaseStorage.getAllSuggestedPresentes()
+      
+      // Filtrar presentes já sugeridos globalmente
       const availablePresentes = allPresentes.filter(presente => 
-        !suggestedPresentes.some(suggested => suggested.nome === presente.nome)
+        !allSuggestedPresentes.includes(presente.nome)
       )
       
-      // Se ainda há presentes disponíveis, sugerir APENAS 1 presente por pessoa
+      let suggestions: PresenteItem[] = []
+      
       if (availablePresentes.length > 0) {
-        const suggestions = availablePresentes.slice(0, 1) // APENAS 1 presente por pessoa
+        // Separar presentes por faixas de preço
+        const caros = availablePresentes.filter(p => (p.prioridade || 9) <= 3) // Prioridade 1-3
+        const medios = availablePresentes.filter(p => (p.prioridade || 9) >= 4 && (p.prioridade || 9) <= 6) // Prioridade 4-6
+        const baratos = availablePresentes.filter(p => (p.prioridade || 9) >= 7) // Prioridade 7-9
+        
+        let selectedPresentes: PresenteItem[] = []
+        
+        if (isIPhone) {
+          // iPhone: 70% caros, 30% baratos
+          const random = Math.random()
+          if (random < 0.7 && caros.length > 0) {
+            selectedPresentes = caros.sort((a, b) => (b.valor || 0) - (a.valor || 0))
+            console.log(`🍎 iPhone: Sugerindo presente CARO (70% chance)`)
+          } else if (baratos.length > 0) {
+            selectedPresentes = baratos.sort((a, b) => (a.valor || 0) - (b.valor || 0))
+            console.log(`🍎 iPhone: Sugerindo presente BARATO (30% chance)`)
+          } else if (medios.length > 0) {
+            selectedPresentes = medios.sort((a, b) => (b.valor || 0) - (a.valor || 0))
+            console.log(`🍎 iPhone: Fallback para MÉDIO`)
+          }
+        } else if (isAndroid) {
+          // Android: 70% baratos, 30% caros
+          const random = Math.random()
+          if (random < 0.7 && baratos.length > 0) {
+            selectedPresentes = baratos.sort((a, b) => (a.valor || 0) - (b.valor || 0))
+            console.log(`🤖 Android: Sugerindo presente BARATO (70% chance)`)
+          } else if (caros.length > 0) {
+            selectedPresentes = caros.sort((a, b) => (b.valor || 0) - (a.valor || 0))
+            console.log(`🤖 Android: Sugerindo presente CARO (30% chance)`)
+          } else if (medios.length > 0) {
+            selectedPresentes = medios.sort((a, b) => (b.valor || 0) - (a.valor || 0))
+            console.log(`🤖 Android: Fallback para MÉDIO`)
+          }
+        } else {
+          // Outros dispositivos: 50% médios, 25% caros, 25% baratos
+          const random = Math.random()
+          if (random < 0.5 && medios.length > 0) {
+            selectedPresentes = medios.sort((a, b) => (b.valor || 0) - (a.valor || 0))
+            console.log(`💻 Outro: Sugerindo presente MÉDIO (50% chance)`)
+          } else if (random < 0.75 && caros.length > 0) {
+            selectedPresentes = caros.sort((a, b) => (b.valor || 0) - (a.valor || 0))
+            console.log(`💻 Outro: Sugerindo presente CARO (25% chance)`)
+          } else if (baratos.length > 0) {
+            selectedPresentes = baratos.sort((a, b) => (a.valor || 0) - (b.valor || 0))
+            console.log(`💻 Outro: Sugerindo presente BARATO (25% chance)`)
+          }
+        }
+        
+        // Se não encontrou presentes na categoria específica, usar fallback
+        if (selectedPresentes.length === 0) {
+          selectedPresentes = availablePresentes
+            .sort((a, b) => (b.valor || 0) - (a.valor || 0))
+          console.log(`🔄 Fallback: Usando primeiro disponível`)
+        }
+        
+        // Pegar apenas 1 presente
+        suggestions = selectedPresentes.slice(0, 1)
         
         // Salvar sugestões no Supabase
         await supabaseStorage.savePresenteSuggestions(ticketId, suggestions)
@@ -149,7 +219,7 @@ export class WhatsAppService {
       return groupSuggestions
     } catch (error) {
       console.error('Erro ao obter sugestões:', error)
-      return this.getPresentesList().slice(0, 5)
+      return this.getPresentesList().slice(0, 1)
     }
   }
 
@@ -175,7 +245,7 @@ export class WhatsAppService {
     const expensivePresentes = this.getPresentesList()
       .filter(p => (p.valor || 0) > 200)
       .sort((a, b) => (b.valor || 0) - (a.valor || 0))
-      .slice(0, 3)
+      .slice(0, 1)
     
     return expensivePresentes.map(presente => ({
       ...presente,
@@ -184,8 +254,27 @@ export class WhatsAppService {
     }))
   }
 
+  // Gerar QR Code para o ingresso
+  private async generateQRCode(ticketId: string): Promise<string> {
+    try {
+      const qrData = `${this.baseUrl}/ingresso?id=${ticketId}`
+      const qrCodeDataURL = await QRCode.toDataURL(qrData, {
+        width: 200,
+        margin: 2,
+        color: {
+          dark: '#000000',
+          light: '#FFFFFF'
+        }
+      })
+      return qrCodeDataURL
+    } catch (error) {
+      console.error('Erro ao gerar QR Code:', error)
+      return ''
+    }
+  }
+
   // Gerar mensagem personalizada
-  private async generateMessage(data: WhatsAppMessageData): Promise<string> {
+  private async generateMessage(data: WhatsAppMessageData, userAgent?: string): Promise<string> {
     const { nome, status, acompanhante, observacoes, ticketId, restricoes_alimentares } = data
     const { noivos, evento } = weddingData.casamento
     
@@ -212,8 +301,8 @@ export class WhatsAppService {
     messageText += `• Código do ingresso: *${ticketId}*\n`
     messageText += `• Seu ingresso personalizado: ${this.baseUrl}/ingresso?id=${ticketId}\n\n`
     
-    // Sistema inteligente de sugestão de presentes - APENAS 1 por pessoa
-    const suggestedPresentes = await this.getSmartPresenteSuggestions(ticketId)
+    // Sistema inteligente de sugestão de presentes baseado no dispositivo
+    const suggestedPresentes = await this.getSmartPresenteSuggestions(ticketId, userAgent)
     
     if (suggestedPresentes.length > 0) {
       const presente = suggestedPresentes[0] // Pegar apenas o primeiro (único)
@@ -262,101 +351,76 @@ export class WhatsAppService {
     return messageText
   }
 
-  // Enviar mensagem via WhatsApp Web para a PESSOA QUE SE CADASTROU
-  async sendWhatsAppMessage(data: WhatsAppMessageData): Promise<boolean> {
+  // ENVIO 100% AUTOMÁTICO via Z-API
+  async sendWhatsAppMessage(data: WhatsAppMessageData, userAgent?: string): Promise<boolean> {
     try {
-      const message = await this.generateMessage(data)
+      // Validar credenciais
+      if (!this.zApiToken || !this.zApiUrl.includes('3E780CBE27A2F0395961EE5C772D9ACD')) {
+        console.error('❌ Credenciais Z-API não configuradas corretamente')
+        return false
+      }
+      
+      const message = await this.generateMessage(data, userAgent)
       const qrCode = await this.generateQRCode(data.ticketId)
       
-      // CORRIGIDO: Enviar para a PESSOA que se cadastrou, não para o admin
-      const whatsappUrl = `https://web.whatsapp.com/send?phone=55${data.telefone}&text=${encodeURIComponent(message)}`
+      // Enviando mensagem automática via Z-API
       
-      // Salvar QR Code no localStorage para exibir na página
-      if (qrCode) {
+      // Salvar QR Code no localStorage para exibir na página (apenas no cliente)
+      if (typeof window !== 'undefined' && qrCode) {
         localStorage.setItem(`qr-${data.ticketId}`, qrCode)
       }
       
-      console.log('📱 Preparando envio para:', data.telefone)
-      console.log('🔗 URL do WhatsApp:', whatsappUrl)
-      
-      // SEMPRE abrir WhatsApp Web para enviar a mensagem
-      console.log('🚀 Abrindo WhatsApp Web automaticamente...')
-      window.open(whatsappUrl, '_blank')
-      
-      // Também tentar via API para logs
-      try {
-        await this.sendViaAPI(data)
-      } catch (error) {
-        console.log('⚠️ API falhou, mas WhatsApp Web foi aberto')
-      }
-      
-      return true
-    } catch (error) {
-      console.error('Erro ao enviar WhatsApp:', error)
-      return false
-    }
-  }
-
-  // Enviar via API (quando implementar servidor)
-  async sendViaAPI(data: WhatsAppMessageData): Promise<boolean> {
-    try {
-      const message = await this.generateMessage(data)
-      const qrCode = await this.generateQRCode(data.ticketId)
-      
-      // CORRIGIDO: Enviar para a PESSOA que se cadastrou
-      const response = await fetch('/api/whatsapp/send', {
+      // ENVIO AUTOMÁTICO via Z-API
+      const clientToken = process.env.NEXT_PUBLIC_ZAPI_CLIENT_TOKEN || ''
+      const response = await fetch(this.zApiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Client-Token': clientToken
         },
         body: JSON.stringify({
-          to: `55${data.telefone}`, // Telefone da pessoa que se cadastrou
-          message,
-          qrCode,
-          ticketId: data.ticketId
+          phone: `55${data.telefone}`,
+          message: message
         })
       })
       
       if (response.ok) {
         const result = await response.json()
-        console.log('✅ API retornou sucesso:', result)
-        
-        // Se a API retornou sucesso, abrir WhatsApp Web automaticamente
-        if (result.whatsappUrl) {
-          console.log('🔗 Abrindo WhatsApp Web...')
-          window.open(result.whatsappUrl, '_blank')
-          return true
-        }
+        return true
+      } else {
+        const errorText = await response.text()
+        console.error('Erro ao enviar via Z-API:', response.status, errorText)
+        return false
       }
       
-      return false
     } catch (error) {
-      console.error('Erro ao enviar via API:', error)
+      console.error('Erro ao enviar mensagem automática:', error)
       return false
     }
   }
 
-  // Fallback para SMS/Email
-  async sendFallback(data: WhatsAppMessageData): Promise<boolean> {
+  // Testar conexão com Z-API
+  async testConnection(): Promise<boolean> {
     try {
-      const message = await this.generateMessage(data)
+      const clientToken = process.env.NEXT_PUBLIC_ZAPI_CLIENT_TOKEN || ''
+      const response = await fetch(`https://api.z-api.io/instances/${process.env.NEXT_PUBLIC_ZAPI_INSTANCE_ID}/token/${this.zApiToken}/status`, {
+        method: 'GET',
+        headers: {
+          'Client-Token': clientToken
+        }
+      })
       
-      // Tentar enviar por email se tiver
-      if (data.telefone.includes('@')) {
-        const emailUrl = `mailto:${data.telefone}?subject=Confirmação de Presença - ${weddingData.casamento.noivos.nome_noiva} & ${weddingData.casamento.noivos.nome_noivo}&body=${encodeURIComponent(message)}`
-        window.open(emailUrl)
+      if (response.ok) {
         return true
+      } else {
+        console.error('Erro na conexão Z-API:', response.status)
+        return false
       }
-      
-      // Tentar enviar por SMS
-      const smsUrl = `sms:${data.telefone}?body=${encodeURIComponent(message)}`
-      window.open(smsUrl)
-      return true
     } catch (error) {
-      console.error('Erro no fallback:', error)
+      console.error('Erro ao testar Z-API:', error)
       return false
     }
   }
 }
 
-export const whatsappService = new WhatsAppService('27996372592')
+export const whatsappAutoService = new WhatsAppAutoService()

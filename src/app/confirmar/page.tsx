@@ -30,6 +30,7 @@ export default function ConfirmarPage() {
   const [showError, setShowError] = useState(false)
   const [duplicateEmail, setDuplicateEmail] = useState(false)
   const [ticketId, setTicketId] = useState<string | null>(null)
+  const [whatsappSent, setWhatsappSent] = useState(false)
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target
@@ -102,12 +103,36 @@ export default function ConfirmarPage() {
             status: formData.status === 'com_acompanhante' ? 'com_acompanhante' : 'confirmado',
             acompanhante: formData.status === 'com_acompanhante' ? formData.observacoes : undefined,
             observacoes: formData.restricoes_alimentares || formData.observacoes || '',
-            ticketId: ticket.id
+            ticketId: ticket.id,
+            restricoes_alimentares: formData.restricoes_alimentares
           }
           
-          // Criar instância com número salvo
-          const service = new (whatsappService.constructor as any)(savedNumber)
-          service.openWhatsApp(whatsappMessage)
+          // ENVIO 100% AUTOMÁTICO via API
+          const response = await fetch('/api/whatsapp/send', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              to: `55${formData.telefone}`,
+              message: whatsappMessage.message || '',
+              ticketId: ticket.id,
+              nome: formData.nome,
+              status: formData.status,
+              acompanhante: formData.status === 'com_acompanhante' ? formData.observacoes : undefined,
+              observacoes: formData.restricoes_alimentares || formData.observacoes || '',
+              restricoes_alimentares: formData.restricoes_alimentares
+            })
+          })
+          
+          if (response.ok) {
+            const result = await response.json()
+            console.log('✅ Mensagem enviada automaticamente!', result)
+            setWhatsappSent(true)
+          } else {
+            console.log('⚠️ Falha no envio automático')
+            setWhatsappSent(false)
+          }
         } catch (error) {
           console.error('Erro ao enviar WhatsApp:', error)
           // Não falha o processo se o WhatsApp der erro
@@ -133,7 +158,8 @@ export default function ConfirmarPage() {
       const fullYear = year && year.length === 2 ? `20${year}` : year || '2026'
       const paddedMonth = month ? month.padStart(2, '0') : '01'
       const paddedDay = day ? day.padStart(2, '0') : '01'
-      const date = new Date(`${fullYear}-${paddedMonth}-${paddedDay}`)
+      // Criar data no formato correto (YYYY-MM-DD)
+      const date = new Date(parseInt(fullYear), parseInt(paddedMonth) - 1, parseInt(paddedDay))
       return date.toLocaleDateString('pt-BR', {
         day: '2-digit',
         month: '2-digit',
@@ -150,10 +176,20 @@ export default function ConfirmarPage() {
   // Verificar se a data limite ainda é válida
   const isRSVPExpired = () => {
     const today = new Date()
-    const deadline = new Date(rsvp.data_limite)
-    console.log('Today:', today)
-    console.log('Deadline:', deadline)
-    console.log('Is expired:', today > deadline)
+    
+    // Converter data limite do formato DD/MM/YY para Date
+    let deadline: Date
+    if (rsvp.data_limite.includes('/')) {
+      const [day, month, year] = rsvp.data_limite.split('/')
+      const fullYear = year && year.length === 2 ? `20${year}` : year || '2026'
+      const paddedMonth = month ? month.padStart(2, '0') : '01'
+      const paddedDay = day ? day.padStart(2, '0') : '01'
+      deadline = new Date(parseInt(fullYear), parseInt(paddedMonth) - 1, parseInt(paddedDay))
+    } else {
+      deadline = new Date(rsvp.data_limite)
+    }
+    
+        // Verificando se RSVP expirou
     return today > deadline
   }
 
@@ -420,6 +456,42 @@ export default function ConfirmarPage() {
             <p className="text-sm text-wedding-green-600 mb-4">
               Seu ingresso foi gerado e uma mensagem foi enviada para seu WhatsApp com todas as informações!
             </p>
+            
+            {/* Status do WhatsApp */}
+            <div className={`p-3 rounded-lg mb-4 ${whatsappSent ? 'bg-green-100 border border-green-200' : 'bg-yellow-100 border border-yellow-200'}`}>
+              <div className="flex items-center gap-2">
+                {whatsappSent ? (
+                  <>
+                    <CheckCircleIcon className="w-5 h-5 text-green-600" />
+                    <p className="text-sm text-green-800 font-medium">
+                      ✅ Mensagem enviada para seu WhatsApp automaticamente!
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <ExclamationTriangleIcon className="w-5 h-5 text-yellow-600" />
+                    <p className="text-sm text-yellow-800 font-medium">
+                      ⚠️ Falha ao enviar WhatsApp automaticamente. Verifique seu número.
+                    </p>
+                  </>
+                )}
+              </div>
+            </div>
+            
+            {/* Informações do ingresso */}
+            {ticketId && (
+              <div className="bg-wedding-cream-100 p-3 rounded-lg mb-4">
+                <h4 className="font-semibold text-wedding-green-800 mb-2 text-sm">Seu Ingresso Personalizado</h4>
+                <p className="text-xs text-wedding-green-700 mb-1">
+                  <strong>Código:</strong> {ticketId}
+                </p>
+                <p className="text-xs text-wedding-green-700">
+                  <strong>Link:</strong> <a href={`/ingresso?id=${ticketId}`} className="text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer">
+                    Ver ingresso completo
+                  </a>
+                </p>
+              </div>
+            )}
             <div className="space-y-2">
               <button
                 onClick={() => {

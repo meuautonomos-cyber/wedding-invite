@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Cormorant_Garamond, Great_Vibes, Inter, Playfair_Display } from 'next/font/google'
 import './globals.css'
 import { weddingData } from '@/data/weddingData'
@@ -82,8 +82,6 @@ export const metadata: Metadata = {
       'max-snippet': -1,
     },
   },
-  viewport: 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no',
-  themeColor: '#339970',
   manifest: '/manifest.json',
   icons: {
     icon: [
@@ -98,6 +96,15 @@ export const metadata: Metadata = {
     ],
   },
   category: 'lifestyle',
+  metadataBase: new URL('https://wedding-invite.netlify.app'),
+}
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  themeColor: '#339970',
 }
 
 export default function RootLayout({

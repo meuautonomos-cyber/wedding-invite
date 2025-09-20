@@ -2,17 +2,11 @@
 
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { cms } from '@/lib/cms'
-import { videoStorage } from '@/lib/videoStorage'
-import { RSVPData, GiftData } from '@/types'
+import { supabaseStorage, RSVPData, GiftData } from '@/lib/supabaseStorage'
 import { 
   UsersIcon,
   GiftIcon,
   DocumentArrowDownIcon,
-  TrashIcon,
-  VideoCameraIcon,
-  CloudArrowUpIcon,
-  PlayIcon,
   PhoneIcon
 } from '@heroicons/react/24/outline'
 
@@ -20,113 +14,38 @@ export default function AdminPage() {
   const [rsvpData, setRsvpData] = useState<RSVPData[]>([])
   const [giftData, setGiftData] = useState<GiftData[]>([])
   const [loading, setLoading] = useState(true)
-  const [activeTab, setActiveTab] = useState<'rsvp' | 'gifts' | 'video'>('rsvp')
-  const [videoFile, setVideoFile] = useState<File | null>(null)
-  const [videoUrl, setVideoUrl] = useState<string>('')
-  const [uploading, setUploading] = useState(false)
+  const [activeTab, setActiveTab] = useState<'rsvp' | 'gifts'>('rsvp')
+  const [statusFilter, setStatusFilter] = useState<'todos' | 'confirmado' | 'com_acompanhante' | 'nao_podera_ir'>('todos')
 
   useEffect(() => {
     loadData()
-    loadCurrentVideo()
   }, [])
-
-  const loadCurrentVideo = () => {
-    const currentVideo = videoStorage.getCurrentVideo()
-    console.log('Admin - Carregando vídeo:', currentVideo)
-    if (currentVideo) {
-      setVideoUrl(currentVideo.url)
-      // Simular um arquivo para exibir as informações
-      const mockFile = new File([], currentVideo.name, { type: currentVideo.type })
-      Object.defineProperty(mockFile, 'size', { value: currentVideo.size })
-      Object.defineProperty(mockFile, 'lastModified', { value: new Date(currentVideo.uploadedAt).getTime() })
-      setVideoFile(mockFile)
-      console.log('Admin - Vídeo carregado com sucesso:', currentVideo.url)
-    } else {
-      console.log('Admin - Nenhum vídeo encontrado no storage')
-    }
-  }
 
   const loadData = async () => {
     setLoading(true)
     try {
+      console.log('Admin - Carregando dados do Supabase...')
+      
+      // Carregar RSVPs e presentes do Supabase
       const [rsvpResponse, giftsResponse] = await Promise.all([
-        cms.getRSVPs(),
-        cms.getGifts()
+        supabaseStorage.getAllRSVPs(),
+        supabaseStorage.getAllGifts()
       ])
+      
+      console.log('Admin - RSVPs carregados:', rsvpResponse.length)
+      console.log('Admin - Presentes carregados:', giftsResponse.length)
       
       setRsvpData(rsvpResponse)
       setGiftData(giftsResponse)
     } catch (error) {
       console.error('Erro ao carregar dados:', error)
+      alert('Erro ao carregar dados do Supabase: ' + (error as Error).message)
     } finally {
       setLoading(false)
     }
   }
 
-  const handleVideoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
-    if (!file) return
 
-    console.log('Admin - Arquivo selecionado:', {
-      name: file.name,
-      size: file.size,
-      type: file.type
-    })
-
-    // Validar tipo de arquivo
-    if (!file.type.startsWith('video/')) {
-      console.log('Admin - Tipo de arquivo inválido:', file.type)
-      alert('Por favor, selecione um arquivo de vídeo válido.')
-      return
-    }
-
-    // Validar tamanho (máximo 3MB)
-    if (file.size > 3 * 1024 * 1024) {
-      console.log('Admin - Arquivo muito grande:', file.size)
-      alert('O arquivo de vídeo deve ter no máximo 3MB (para evitar problemas de armazenamento).')
-      return
-    }
-
-    console.log('Admin - Arquivo válido, iniciando upload automático...')
-    setVideoFile(file)
-    setVideoUrl(URL.createObjectURL(file))
-    
-    // Upload automático
-    setUploading(true)
-    try {
-      console.log('Admin - Iniciando upload automático do vídeo:', file.name)
-      console.log('Admin - Convertendo vídeo para base64... (isso pode demorar para arquivos grandes)')
-      
-      // Upload do vídeo usando o sistema de armazenamento
-      const videoData = await videoStorage.uploadVideo(file)
-      console.log('Admin - Vídeo enviado com sucesso:', videoData)
-      
-      alert('Vídeo enviado com sucesso! Agora ele persistirá mesmo após recarregar a página.')
-      
-      // Recarregar o vídeo atual
-      loadCurrentVideo()
-      
-    } catch (error) {
-      console.error('Admin - Erro ao enviar vídeo:', error)
-      const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido'
-      alert('Erro ao enviar vídeo: ' + errorMessage)
-      
-      // Limpar arquivo selecionado em caso de erro
-      setVideoFile(null)
-      setVideoUrl('')
-      if (event.target) {
-        event.target.value = ''
-      }
-    } finally {
-      setUploading(false)
-    }
-  }
-
-  const handleVideoRemove = () => {
-    videoStorage.removeVideo()
-    setVideoFile(null)
-    setVideoUrl('')
-  }
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -147,10 +66,43 @@ export default function AdminPage() {
         return 'Confirmado'
       case 'com_acompanhante':
         return 'Com Acompanhante'
-      case 'nao_poderei':
+      case 'nao_podera_ir':
         return 'Não Poderá Ir'
       default:
         return status
+    }
+  }
+
+  // Filtrar RSVPs por status
+  const filteredRSVPs = rsvpData.filter(rsvp => {
+    if (statusFilter === 'todos') return true
+    return rsvp.status === statusFilter
+  })
+
+  // Estatísticas dos filtros
+  const getFilterStats = () => {
+    const total = rsvpData.length
+    const confirmados = rsvpData.filter(r => r.status === 'confirmado').length
+    const comAcompanhante = rsvpData.filter(r => r.status === 'com_acompanhante').length
+    const naoPoderao = rsvpData.filter(r => r.status === 'nao_podera_ir').length
+    
+    return { total, confirmados, comAcompanhante, naoPoderao }
+  }
+
+  // Atualizar status do presente
+  const handleUpdateGiftStatus = async (giftId: string, newStatus: 'pendente' | 'confirmado' | 'entregue') => {
+    try {
+      const success = await supabaseStorage.updateGiftStatus(giftId, newStatus)
+      if (success) {
+        // Recarregar dados após atualização
+        loadData()
+        alert(`Status atualizado para: ${newStatus}`)
+      } else {
+        alert('Erro ao atualizar status')
+      }
+    } catch (error) {
+      console.error('Erro ao atualizar status:', error)
+      alert('Erro ao atualizar status')
     }
   }
 
@@ -220,17 +172,6 @@ export default function AdminPage() {
             <GiftIcon className="w-5 h-5 inline mr-2" />
             Presentes ({giftData.length})
           </button>
-          <button
-            onClick={() => setActiveTab('video')}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-              activeTab === 'video'
-                ? 'bg-wedding-green-600 text-white'
-                : 'bg-white text-wedding-green-700 hover:bg-wedding-green-50'
-            }`}
-          >
-            <VideoCameraIcon className="w-5 h-5 inline mr-2" />
-            Vídeo Convite
-          </button>
           <a
             href="/admin/whatsapp"
             className="px-4 py-2 rounded-lg font-medium transition-colors bg-white text-wedding-green-700 hover:bg-wedding-green-50 border border-wedding-green-200"
@@ -251,12 +192,66 @@ export default function AdminPage() {
               <div className="flex justify-between items-center">
                 <h2 className="text-xl font-semibold">Confirmações de Presença</h2>
                 <button
-                  onClick={() => exportToCSV(rsvpData, 'rsvps.csv')}
+                  onClick={() => exportToCSV(filteredRSVPs, 'rsvps.csv')}
                   className="flex items-center space-x-2 px-4 py-2 bg-white text-wedding-green-600 rounded-lg hover:bg-wedding-green-50 transition-colors"
                 >
                   <DocumentArrowDownIcon className="w-5 h-5" />
                   <span>Exportar CSV</span>
                 </button>
+              </div>
+            </div>
+            
+            {/* Filtros e Estatísticas */}
+            <div className="px-6 py-4 bg-gray-50 border-b">
+              <div className="flex flex-wrap items-center justify-between gap-4">
+                {/* Filtros por status */}
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    onClick={() => setStatusFilter('todos')}
+                    className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
+                      statusFilter === 'todos'
+                        ? 'bg-wedding-green-600 text-white'
+                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    }`}
+                  >
+                    Todos ({getFilterStats().total})
+                  </button>
+                  <button
+                    onClick={() => setStatusFilter('confirmado')}
+                    className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
+                      statusFilter === 'confirmado'
+                        ? 'bg-green-600 text-white'
+                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    }`}
+                  >
+                    Confirmados ({getFilterStats().confirmados})
+                  </button>
+                  <button
+                    onClick={() => setStatusFilter('com_acompanhante')}
+                    className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
+                      statusFilter === 'com_acompanhante'
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    }`}
+                  >
+                    Com Acompanhante ({getFilterStats().comAcompanhante})
+                  </button>
+                  <button
+                    onClick={() => setStatusFilter('nao_podera_ir')}
+                    className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
+                      statusFilter === 'nao_podera_ir'
+                        ? 'bg-red-600 text-white'
+                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    }`}
+                  >
+                    Não Poderão Ir ({getFilterStats().naoPoderao})
+                  </button>
+                </div>
+                
+                {/* Contador de resultados filtrados */}
+                <div className="text-sm text-gray-600">
+                  Mostrando {filteredRSVPs.length} de {rsvpData.length} confirmações
+                </div>
               </div>
             </div>
             
@@ -273,7 +268,7 @@ export default function AdminPage() {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {rsvpData.map((rsvp, index) => (
+                  {filteredRSVPs.map((rsvp, index) => (
                     <tr key={index} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                         {rsvp.nome}
@@ -333,16 +328,17 @@ export default function AdminPage() {
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Comprador</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ações</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {giftData.map((gift, index) => (
                     <tr key={index} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                        {gift.item_nome || 'Presente'}
+                        {gift.item_nome || gift.tipo}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {gift.tipo}
+                        {gift.categoria || gift.tipo}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         R$ {gift.valor?.toFixed(2) || '0.00'}
@@ -362,6 +358,31 @@ export default function AdminPage() {
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         {new Date(gift.data_presente).toLocaleDateString('pt-BR')}
                       </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <div className="flex space-x-1">
+                          {gift.status === 'pendente' && (
+                            <button
+                              onClick={() => handleUpdateGiftStatus(gift.id, 'confirmado')}
+                              className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded hover:bg-green-200 transition-colors"
+                              title="Confirmar presente"
+                            >
+                              ✓
+                            </button>
+                          )}
+                          {gift.status === 'confirmado' && (
+                            <button
+                              onClick={() => handleUpdateGiftStatus(gift.id, 'entregue')}
+                              className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded hover:bg-blue-200 transition-colors"
+                              title="Marcar como entregue"
+                            >
+                              📦
+                            </button>
+                          )}
+                          {gift.status === 'entregue' && (
+                            <span className="text-xs text-gray-400">Finalizado</span>
+                          )}
+                        </div>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -370,91 +391,6 @@ export default function AdminPage() {
           </motion.div>
         )}
 
-        {/* Video Tab */}
-        {activeTab === 'video' && (
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="space-y-6"
-          >
-            <div className="bg-white rounded-xl shadow-lg p-6">
-              <h2 className="text-xl font-semibold text-wedding-green-800 mb-4">
-                Upload do Vídeo Convite
-              </h2>
-              
-              <div className="mb-6">
-                <h3 className="text-lg font-medium text-gray-800 mb-2">Instruções:</h3>
-                <ul className="text-sm text-gray-600 space-y-1">
-                  <li>• Formato obrigatório: 1080x1920 (vertical)</li>
-                  <li>• O vídeo será exibido em tela cheia no formato vertical</li>
-                  <li>• Upload Automático: O vídeo é enviado automaticamente ao selecionar</li>
-                  <li>• Persistência: O vídeo permanece após recarregar a página (F5)</li>
-                  <li>• Tamanho máximo: 3MB (para evitar problemas de armazenamento)</li>
-                </ul>
-              </div>
-
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
-                <input
-                  type="file"
-                  accept="video/*"
-                  onChange={handleVideoUpload}
-                  disabled={uploading}
-                  className="hidden"
-                  id="video-upload"
-                />
-                <label
-                  htmlFor="video-upload"
-                  className={`cursor-pointer ${uploading ? 'opacity-50 cursor-not-allowed' : ''}`}
-                >
-                  <CloudArrowUpIcon className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-lg font-medium text-gray-700 mb-2">
-                    {uploading ? 'Enviando vídeo...' : 'Clique para selecionar um vídeo'}
-                  </p>
-                  <p className="text-sm text-gray-500">
-                    {uploading ? 'Aguarde...' : 'MP4, MOV, AVI (máx. 3MB)'}
-                  </p>
-                </label>
-              </div>
-
-              {videoFile && (
-                <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-                  <h3 className="font-medium text-gray-800 mb-2">Vídeo Atual:</h3>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-gray-600">
-                        <strong>Nome:</strong> {videoFile.name}
-                      </p>
-                      <p className="text-sm text-gray-600">
-                        <strong>Tamanho:</strong> {(videoFile.size / (1024 * 1024)).toFixed(2)} MB
-                      </p>
-                      <p className="text-sm text-gray-600">
-                        <strong>Última modificação:</strong> {new Date(videoFile.lastModified).toLocaleString('pt-BR')}
-                      </p>
-                    </div>
-                    <div className="flex space-x-2">
-                      {videoUrl && (
-                        <button
-                          onClick={() => window.open(videoUrl, '_blank')}
-                          className="flex items-center space-x-1 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                        >
-                          <PlayIcon className="w-4 h-4" />
-                          <span>Visualizar</span>
-                        </button>
-                      )}
-                      <button
-                        onClick={handleVideoRemove}
-                        className="flex items-center space-x-1 px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
-                      >
-                        <TrashIcon className="w-4 h-4" />
-                        <span>Remover</span>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          </motion.div>
-        )}
       </div>
     </div>
   )

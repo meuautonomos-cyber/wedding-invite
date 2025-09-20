@@ -43,7 +43,7 @@ export const weddingData: WeddingData = {
       ]
     },
     rsvp: {
-      data_limite: "2026-02-21",
+      data_limite: "21/02/26",
       limite_total: 200,
       mensagem_pos_confirmacao: "Obrigado! Estamos contando os dias."
     },

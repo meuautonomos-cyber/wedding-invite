@@ -23,6 +23,34 @@ export default function SitePage() {
     setOpenFAQ(openFAQ === index ? null : index)
   }
 
+  // Funções de touch para o carrossel
+  const [touchStart, setTouchStart] = useState<number | null>(null)
+  const [touchEnd, setTouchEnd] = useState<number | null>(null)
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null)
+    setTouchStart(e.targetTouches[0].clientX)
+  }
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX)
+  }
+
+  const handleTouchEnd = () => {
+    if (!touchStart || !touchEnd) return
+    
+    const distance = touchStart - touchEnd
+    const isLeftSwipe = distance > 50
+    const isRightSwipe = distance < -50
+
+    if (isLeftSwipe && currentSlide < valleVerdeImages.length - 1) {
+      setCurrentSlide(currentSlide + 1)
+    }
+    if (isRightSwipe && currentSlide > 0) {
+      setCurrentSlide(currentSlide - 1)
+    }
+  }
+
   // Dados das imagens do Valle Verde
   const valleVerdeImages = [
     {
@@ -60,9 +88,9 @@ export default function SitePage() {
   }
 
   return (
-    <div className="min-h-screen bg-wedding-cream-50">
+    <div className="min-h-screen bg-wedding-cream-50 relative z-0">
       {/* Header */}
-      <header className="sticky top-0 bg-white/95 backdrop-blur-md border-b border-wedding-cream-200 z-50 shadow-sm">
+      <header className="sticky top-0 bg-white/95 backdrop-blur-md border-b border-wedding-cream-200 z-[100] shadow-sm">
         <div className="flex items-center justify-between p-4">
           <motion.button
             whileHover={{ scale: 1.1 }}
@@ -80,7 +108,7 @@ export default function SitePage() {
         </div>
       </header>
 
-      <main className="px-4 py-8 max-w-4xl mx-auto">
+      <main className="px-4 py-8 max-w-4xl mx-auto relative z-10">
         {/* Nossa História - Design Elegante */}
         <motion.section
           initial={{ opacity: 0, y: 20 }}
@@ -419,9 +447,9 @@ export default function SitePage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.6 }}
-              className="mb-16"
+              className="mb-16 relative z-10"
             >
-              <div className="text-center mb-12">
+              <div className="text-center mb-12 relative z-20">
                 <h2 className="text-4xl font-script text-wedding-olive-800 mb-4">
                   Padrinhos e Madrinhas
                 </h2>
@@ -431,16 +459,16 @@ export default function SitePage() {
                 </p>
               </div>
               
-              <div className="max-w-6xl mx-auto">
+              <div className="max-w-6xl mx-auto relative z-20">
                 {/* Card principal com decoração */}
-                <div className="bg-white rounded-3xl p-8 shadow-xl border border-wedding-ring/20 overflow-hidden relative">
+                <div className="bg-white rounded-3xl p-8 shadow-xl border border-wedding-ring/20 overflow-hidden relative z-10">
                   {/* Decoração de fundo */}
-                  <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-wedding-gold/5 to-wedding-olive/5 rounded-full -translate-y-32 translate-x-32"></div>
-                  <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-wedding-cream/10 to-wedding-gold/10 rounded-full translate-y-24 -translate-x-24"></div>
+                  <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-wedding-gold/5 to-wedding-olive/5 rounded-full -translate-y-32 translate-x-32 z-0"></div>
+                  <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-wedding-cream/10 to-wedding-gold/10 rounded-full translate-y-24 -translate-x-24 z-0"></div>
                   
                   <div className="relative z-10">
                     {/* Grid responsivo com design elegante */}
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6 sm:gap-8 md:gap-10 relative z-20">
                       {padrinhoes.map((padrinho, index) => (
                         <motion.div
                           key={index}
@@ -452,14 +480,14 @@ export default function SitePage() {
                             type: "spring",
                             stiffness: 100
                           }}
-                          className="group text-center"
+                          className="group text-center relative z-20"
                         >
                           {/* Card individual com hover effect */}
-                          <div className="bg-white/50 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-wedding-ring/30 hover:shadow-2xl hover:scale-105 transition-all duration-500 group-hover:bg-white/80">
+                          <div className="bg-white/50 backdrop-blur-sm rounded-2xl p-6 sm:p-8 shadow-lg border border-wedding-ring/30 hover:shadow-2xl hover:scale-105 transition-all duration-500 group-hover:bg-white/80 h-full flex flex-col relative z-10 items-center min-h-[220px]">
                             
-                            {/* Foto com efeito elegante */}
-                            <div className="relative mb-4">
-                              <div className="w-28 h-28 mx-auto relative">
+                            {/* Foto com efeito elegante - CENTRALIZADA */}
+                            <div className="relative mb-6 flex-shrink-0 z-20 flex justify-center">
+                              <div className="w-24 h-24 sm:w-28 sm:h-28 relative">
                                 {/* Anel dourado decorativo */}
                                 <div className="absolute inset-0 rounded-full bg-gradient-to-br from-wedding-gold to-wedding-olive p-1">
                                   <div className="w-full h-full rounded-full overflow-hidden bg-white">
@@ -485,34 +513,34 @@ export default function SitePage() {
                               </div>
                             </div>
                             
-                            {/* Informações */}
-                            <div className="space-y-2">
-                              <h3 className="font-semibold text-wedding-olive-800 text-lg group-hover:text-wedding-gold transition-colors duration-300">
+                            {/* Informações - COM QUEBRA DE LINHA PERMITIDA */}
+                            <div className="space-y-3 flex-grow flex flex-col justify-center relative z-20 text-center w-full">
+                              <h3 className="font-semibold text-wedding-olive-800 text-sm sm:text-base group-hover:text-wedding-gold transition-colors duration-300 leading-tight text-center">
                                 {padrinho.nome}
                               </h3>
                               <div className="flex items-center justify-center gap-2">
                                 <div className={`w-2 h-2 rounded-full ${padrinho.relacao === 'Madrinha' ? 'bg-pink-400' : 'bg-blue-400'}`}></div>
-                                <p className="text-wedding-olive-600 font-medium text-sm">
+                                <p className="text-wedding-olive-600 font-medium text-xs sm:text-sm">
                                   {padrinho.relacao}
                                 </p>
                               </div>
                             </div>
                             
                             {/* Linha decorativa */}
-                            <div className="mt-4 w-12 h-0.5 bg-gradient-to-r from-wedding-gold to-wedding-olive mx-auto rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                            <div className="mt-6 w-12 h-0.5 bg-gradient-to-r from-wedding-gold to-wedding-olive mx-auto rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 relative z-20 flex-shrink-0"></div>
                           </div>
                         </motion.div>
                       ))}
                     </div>
                     
                     {/* Mensagem especial */}
-                    <div className="mt-12 text-center">
+                    <div className="mt-12 text-center relative z-20">
                       <div className="bg-gradient-to-r from-wedding-gold/10 to-wedding-olive/10 rounded-2xl p-6 border border-wedding-ring/30">
                         <p className="text-wedding-olive-700 text-lg italic leading-relaxed">
                           &ldquo;Agradecemos a cada um de vocês por fazerem parte desta jornada conosco. 
                           Sua presença e apoio significam o mundo para nós.&rdquo;
                         </p>
-                        <div className="mt-4 flex items-center justify-center gap-2">
+                        <div className="mt-4 flex items-center justify-center gap-2 relative z-20">
                           <div className="w-8 h-0.5 bg-wedding-gold rounded-full"></div>
                           <span className="text-wedding-gold font-script text-xl">Esther & Anthony</span>
                           <div className="w-8 h-0.5 bg-wedding-gold rounded-full"></div>
@@ -524,55 +552,6 @@ export default function SitePage() {
               </div>
             </motion.section>
 
-        {/* Dúvidas Frequentes */}
-        <motion.section
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.8 }}
-          className="mb-12"
-        >
-          <h2 className="text-3xl font-script text-wedding-olive-800 text-center mb-8">
-            Dúvidas Frequentes
-          </h2>
-          <div className="space-y-4">
-            {faqs.map((faq, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="card"
-              >
-                <button
-                  onClick={() => toggleFAQ(index)}
-                  className="w-full flex items-center justify-between text-left"
-                >
-                  <h3 className="font-medium text-wedding-olive-800 pr-4">
-                    {faq.pergunta}
-                  </h3>
-                  {openFAQ === index ? (
-                    <ChevronUpIcon className="w-5 h-5 text-wedding-olive-600 flex-shrink-0" />
-                  ) : (
-                    <ChevronDownIcon className="w-5 h-5 text-wedding-olive-600 flex-shrink-0" />
-                  )}
-                </button>
-                {openFAQ === index && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    exit={{ opacity: 0, height: 0 }}
-                    transition={{ duration: 0.3 }}
-                    className="mt-4 pt-4 border-t border-wedding-cream-200"
-                  >
-                    <p className="text-wedding-olive-700 leading-relaxed">
-                      {faq.resposta}
-                    </p>
-                  </motion.div>
-                )}
-              </motion.div>
-            ))}
-          </div>
-        </motion.section>
 
             {/* Informações do Evento - Com Fotos do Local */}
             <motion.section
@@ -663,48 +642,32 @@ export default function SitePage() {
                         Conheça o Valle Verde
                       </h3>
                       
-                      <div className="relative max-w-4xl mx-auto">
-                        {/* Carrossel container */}
-                        <div className="relative overflow-hidden rounded-2xl shadow-2xl">
-                          <div className="flex transition-transform duration-500 ease-in-out" style={{ transform: `translateX(-${currentSlide * 100}%)` }}>
+                      <div className="relative w-full">
+                        {/* Carrossel container com touch support */}
+                        <div 
+                          className="relative overflow-hidden rounded-2xl shadow-2xl touch-pan-x"
+                          onTouchStart={handleTouchStart}
+                          onTouchMove={handleTouchMove}
+                          onTouchEnd={handleTouchEnd}
+                        >
+                          <div className="flex transition-transform duration-300 ease-out" style={{ transform: `translateX(-${currentSlide * 100}%)` }}>
                             {valleVerdeImages.map((image, index) => (
                               <div key={index} className="w-full flex-shrink-0">
-                                <div className="aspect-[16/9] bg-wedding-cream-200 overflow-hidden relative group">
+                                <div className="aspect-[4/3] sm:aspect-[16/9] bg-wedding-cream-200 overflow-hidden relative group">
                                   <img
                                     src={image.src}
                                     alt={image.alt}
                                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 high-quality-image"
                                   />
                                   <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
-                                  <div className="absolute bottom-6 left-6 right-6 text-white">
-                                    <p className="text-lg font-semibold mb-2">{image.title}</p>
-                                    <p className="text-sm opacity-90">{image.description}</p>
+                                  <div className="absolute bottom-4 left-4 right-4 text-white">
+                                    <p className="text-base sm:text-lg font-semibold mb-1 sm:mb-2">{image.title}</p>
+                                    <p className="text-xs sm:text-sm opacity-90">{image.description}</p>
                                   </div>
                                 </div>
                               </div>
                             ))}
                           </div>
-                          
-                          {/* Botões de navegação */}
-                          <button
-                            onClick={prevSlide}
-                            className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg hover:bg-white hover:scale-110 transition-all duration-300 z-10"
-                            aria-label="Foto anterior"
-                          >
-                            <svg className="w-6 h-6 text-wedding-olive" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                            </svg>
-                          </button>
-                          
-                          <button
-                            onClick={nextSlide}
-                            className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg hover:bg-white hover:scale-110 transition-all duration-300 z-10"
-                            aria-label="Próxima foto"
-                          >
-                            <svg className="w-6 h-6 text-wedding-olive" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                            </svg>
-                          </button>
                         </div>
                         
                         {/* Indicadores de slide */}
@@ -743,6 +706,67 @@ export default function SitePage() {
                 </div>
               </div>
             </motion.section>
+
+        {/* Dúvidas Frequentes - Última seção */}
+        <motion.section
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 1.2 }}
+          className="mb-16"
+        >
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-script text-wedding-olive-800 mb-4">
+              Dúvidas Frequentes
+            </h2>
+            <div className="w-24 h-1 bg-gradient-to-r from-wedding-gold to-wedding-olive mx-auto rounded-full"></div>
+            <p className="text-wedding-olive-600 mt-4 text-lg italic">
+              Esclarecemos as principais dúvidas sobre nosso casamento
+            </p>
+          </div>
+          
+          <div className="max-w-4xl mx-auto">
+            <div className="bg-white rounded-3xl p-8 shadow-xl border border-wedding-ring/20">
+              <div className="space-y-4">
+                {faqs.map((faq, index) => (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: index * 0.1 }}
+                    className="bg-wedding-cream/30 rounded-2xl p-6 hover:bg-wedding-cream/50 transition-colors duration-300"
+                  >
+                    <button
+                      onClick={() => toggleFAQ(index)}
+                      className="w-full flex items-center justify-between text-left"
+                    >
+                      <h3 className="font-semibold text-wedding-olive-800 text-lg pr-4">
+                        {faq.pergunta}
+                      </h3>
+                      {openFAQ === index ? (
+                        <ChevronUpIcon className="w-6 h-6 text-wedding-gold flex-shrink-0" />
+                      ) : (
+                        <ChevronDownIcon className="w-6 h-6 text-wedding-gold flex-shrink-0" />
+                      )}
+                    </button>
+                    {openFAQ === index && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.3 }}
+                        className="mt-4 pt-4 border-t border-wedding-ring/30"
+                      >
+                        <p className="text-wedding-olive-700 leading-relaxed text-base">
+                          {faq.resposta}
+                        </p>
+                      </motion.div>
+                    )}
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </motion.section>
       </main>
     </div>
   )

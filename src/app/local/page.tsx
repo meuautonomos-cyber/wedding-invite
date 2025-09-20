@@ -192,9 +192,8 @@ export default function LocalPage() {
             </h4>
             <ul className="space-y-2 text-wedding-green-700">
               <li>• Chegue 15 minutos antes do horário</li>
-              <li>• Confirme sua presença até {evento.data}</li>
+              <li>• Confirme sua presença até 21/02/26 (30 dias antes)</li>
               <li>• Em caso de dúvidas, entre em contato</li>
-              <li>• Crianças são muito bem-vindas!</li>
             </ul>
           </div>
         </motion.div>

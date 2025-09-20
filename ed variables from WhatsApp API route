@@ -1,0 +1,49 @@
+[33mcommit bc2d201606001ac79ef75bdfce39458dd214a3f2[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m
+Author: meuautonomos-cyber <meuautonomos@gmail.com>
+Date:   Sat Sep 20 04:34:30 2025 -0300
+
+    feat: Sistema de sugestões de presentes inteligente
+    
+    - Implementado sistema probabilístico baseado em dispositivo
+    - iPhone: 70% presentes caros, 30% baratos
+    - Android: 70% presentes baratos, 30% caros
+    - Outros: 50% médios, 25% caros, 25% baratos
+    - Corrigidos todos os links dos presentes com URLs reais
+    - Alterado 'Sousplat' para 'Travessa de Porcelanato'
+    - Removido pop-up de confirmação do WhatsApp
+    - Sistema evita repetições de presentes
+    - Suporte para 80+ convidados
+
+ CONFIGURACAO_ZAPI.md                 |   82 [32m++[m
+ Fotos/layout principal 1080x1920.png |  Bin [31m0[m -> [32m2040203[m bytes
+ GUIA_TESTE_SISTEMA.md                |  102 [32m++[m
+ MELHORIAS_SISTEMA.md                 |  118 [32m++[m
+ WHATSAPP_SETUP.md                    |  246 [32m++++[m
+ package-lock.json                    | 2033 [32m++++++++++++++++++++++++++++++++[m[31m--[m
+ package.json                         |    9 [32m+[m[31m-[m
+ public/apple-touch-icon.png          |  Bin [31m0[m -> [32m2891260[m bytes
+ public/favicon-16x16.png             |  Bin [31m0[m -> [32m2891260[m bytes
+ public/favicon-32x32.png             |  Bin [31m0[m -> [32m2891260[m bytes
+ public/images/layout-principal.png   |  Bin [31m2891260[m -> [32m2040203[m bytes
+ public/safari-pinned-tab.svg         |  Bin [31m0[m -> [32m2891260[m bytes
+ src/app/admin/page.tsx               |  324 [32m+++[m[31m---[m
+ src/app/api/whatsapp/send/route.ts   |   60 [32m+[m
+ src/app/confirmar/page.tsx           |   90 [32m+[m[31m-[m
+ src/app/layout.tsx                   |   13 [32m+[m[31m-[m
+ src/app/local/page.tsx               |    3 [32m+[m[31m-[m
+ src/app/page.tsx                     |  119 [32m+[m[31m-[m
+ src/app/presentes/page.tsx           |   39 [32m+[m[31m-[m
+ src/app/site/page.tsx                |  224 [32m++[m[31m--[m
+ src/data/weddingData.ts              |    2 [32m+[m[31m-[m
+ src/lib/supabase.ts                  |   12 [32m+[m[31m-[m
+ src/lib/supabaseStorage.ts           |  207 [32m+++[m[31m-[m
+ src/lib/whatsappAutoService.ts       |  426 [32m+++++++[m
+ src/lib/whatsappService.ts           |  413 [32m+++++[m[31m--[m
+ supabase-schema.sql                  |   61 [32m+[m
+ test-mensagem-whatsapp.js            |   30 [32m+[m
+ test-sistema-inteligente.js          |   59 [32m+[m
+ test-whatsapp-envio.js               |   67 [32m++[m
+ whatsapp-business-setup.md           |   55 [32m+[m
+ whatsapp-server-package.json         |   22 [32m+[m
+ whatsapp-server.js                   |  122 [32m++[m
+ 32 files changed, 4380 insertions(+), 558 deletions(-)

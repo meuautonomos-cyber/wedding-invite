@@ -4,7 +4,7 @@ import { whatsappAutoService } from '@/lib/whatsappAutoService'
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { to, message, qrCode, ticketId, nome, status, acompanhante, observacoes, restricoes_alimentares } = body
+    const { to, ticketId, nome, status, acompanhante, observacoes, restricoes_alimentares } = body
     
     // Capturar User-Agent do request
     const userAgent = request.headers.get('user-agent') || ''

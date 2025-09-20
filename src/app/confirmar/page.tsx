@@ -95,7 +95,6 @@ export default function ConfirmarPage() {
       if (formData.status !== 'nao_podera_ir') {
         try {
           // Carregar número do WhatsApp salvo
-          const savedNumber = localStorage.getItem('wedding-whatsapp-number') || '27996372592'
           const whatsappMessage = {
             nome: formData.nome,
             telefone: formData.telefone,

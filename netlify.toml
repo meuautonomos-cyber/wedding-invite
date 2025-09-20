@@ -6,6 +6,9 @@
   NODE_VERSION = "18"
   SECRETS_SCAN_ENABLED = "false"
 
+[functions]
+  directory = "netlify/functions"
+
 [[redirects]]
   from = "/*"
   to = "/index.html"

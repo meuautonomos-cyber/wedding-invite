@@ -94,8 +94,8 @@ export default function ConfirmarPage() {
       // Enviar WhatsApp automaticamente APENAS se confirmar presença
       if (formData.status !== 'nao_podera_ir') {
         try {
-          // ENVIO 100% AUTOMÁTICO via API
-          const response = await fetch('/api/whatsapp/send', {
+          // ENVIO 100% AUTOMÁTICO via Netlify Function
+          const response = await fetch('/.netlify/functions/whatsapp-send', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',

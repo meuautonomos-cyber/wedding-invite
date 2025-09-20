@@ -1,0 +1,9 @@
+{
+  "name": "netlify-functions",
+  "version": "1.0.0",
+  "description": "Netlify Functions for Wedding Invite",
+  "main": "whatsapp-send.js",
+  "dependencies": {
+    "node-fetch": "^2.6.7"
+  }
+}

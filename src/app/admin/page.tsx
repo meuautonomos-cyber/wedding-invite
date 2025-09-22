@@ -170,64 +170,73 @@ export default function AdminPage() {
 
   return (
     <div className="min-h-screen bg-wedding-cream-50">
-      <div className="container mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-wedding-green-800 mb-2">Painel Administrativo</h1>
-          <p className="text-wedding-green-600">Gerencie RSVPs, presentes e vídeo convite</p>
+      <div className="container mx-auto px-2 sm:px-4 py-4 sm:py-8">
+        <div className="mb-4 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl font-bold text-wedding-green-800 mb-2">Painel Administrativo</h1>
+          <p className="text-sm sm:text-base text-wedding-green-600">Gerencie RSVPs, presentes e vídeo convite</p>
         </div>
 
         {/* Tabs */}
-        <div className="flex flex-wrap gap-2 mb-8">
+        <div className="flex flex-wrap gap-1 sm:gap-2 mb-4 sm:mb-8">
           <button
             onClick={() => setActiveTab('rsvp')}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+            className={`px-2 sm:px-4 py-2 rounded-lg font-medium transition-colors text-xs sm:text-sm ${
               activeTab === 'rsvp'
                 ? 'bg-wedding-green-600 text-white'
                 : 'bg-white text-wedding-green-700 hover:bg-wedding-green-50'
             }`}
           >
-            <UsersIcon className="w-5 h-5 inline mr-2" />
-            RSVPs ({rsvpData.length})
+            <UsersIcon className="w-4 h-4 sm:w-5 sm:h-5 inline mr-1 sm:mr-2" />
+            <span className="hidden sm:inline">RSVPs</span>
+            <span className="sm:hidden">RSVP</span>
+            <span className="ml-1">({rsvpData.length})</span>
           </button>
           <button
             onClick={() => setActiveTab('gifts')}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+            className={`px-2 sm:px-4 py-2 rounded-lg font-medium transition-colors text-xs sm:text-sm ${
               activeTab === 'gifts'
                 ? 'bg-wedding-green-600 text-white'
                 : 'bg-white text-wedding-green-700 hover:bg-wedding-green-50'
             }`}
           >
-            <GiftIcon className="w-5 h-5 inline mr-2" />
-            Presentes ({giftData.length})
+            <GiftIcon className="w-4 h-4 sm:w-5 sm:h-5 inline mr-1 sm:mr-2" />
+            <span className="hidden sm:inline">Presentes</span>
+            <span className="sm:hidden">Gifts</span>
+            <span className="ml-1">({giftData.length})</span>
           </button>
           <button
             onClick={() => setActiveTab('reconfirmations')}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+            className={`px-2 sm:px-4 py-2 rounded-lg font-medium transition-colors text-xs sm:text-sm ${
               activeTab === 'reconfirmations'
                 ? 'bg-wedding-green-600 text-white'
                 : 'bg-white text-wedding-green-700 hover:bg-wedding-green-50'
             }`}
           >
-            <CheckCircleIcon className="w-5 h-5 inline mr-2" />
-            Reconfirmações ({reconfirmationData.length})
+            <CheckCircleIcon className="w-4 h-4 sm:w-5 sm:h-5 inline mr-1 sm:mr-2" />
+            <span className="hidden sm:inline">Reconfirmações</span>
+            <span className="sm:hidden">Reconf</span>
+            <span className="ml-1">({reconfirmationData.length})</span>
           </button>
           <button
             onClick={() => setActiveTab('messages')}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+            className={`px-2 sm:px-4 py-2 rounded-lg font-medium transition-colors text-xs sm:text-sm ${
               activeTab === 'messages'
                 ? 'bg-wedding-green-600 text-white'
                 : 'bg-white text-wedding-green-700 hover:bg-wedding-green-50'
             }`}
           >
-            <ChatBubbleLeftRightIcon className="w-5 h-5 inline mr-2" />
-            Mensagens ({guestMessages.length})
+            <ChatBubbleLeftRightIcon className="w-4 h-4 sm:w-5 sm:h-5 inline mr-1 sm:mr-2" />
+            <span className="hidden sm:inline">Mensagens</span>
+            <span className="sm:hidden">Msgs</span>
+            <span className="ml-1">({guestMessages.length})</span>
           </button>
           <a
             href="/admin/whatsapp"
-            className="px-4 py-2 rounded-lg font-medium transition-colors bg-white text-wedding-green-700 hover:bg-wedding-green-50 border border-wedding-green-200"
+            className="px-2 sm:px-4 py-2 rounded-lg font-medium transition-colors text-xs sm:text-sm bg-white text-wedding-green-700 hover:bg-wedding-green-50 border border-wedding-green-200"
           >
-            <PhoneIcon className="w-5 h-5 inline mr-2" />
-            Configurar WhatsApp
+            <PhoneIcon className="w-4 h-4 sm:w-5 sm:h-5 inline mr-1 sm:mr-2" />
+            <span className="hidden sm:inline">Configurar WhatsApp</span>
+            <span className="sm:hidden">WA</span>
           </a>
         </div>
 
@@ -238,27 +247,27 @@ export default function AdminPage() {
             animate={{ opacity: 1, x: 0 }}
             className="bg-white rounded-xl shadow-lg overflow-hidden"
           >
-            <div className="px-6 py-4 bg-wedding-green-600 text-white">
-              <div className="flex justify-between items-center">
-                <h2 className="text-xl font-semibold">Confirmações de Presença</h2>
+            <div className="px-4 sm:px-6 py-4 bg-wedding-green-600 text-white">
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+                <h2 className="text-lg sm:text-xl font-semibold">Confirmações de Presença</h2>
                 <button
                   onClick={() => exportToCSV(filteredRSVPs, 'rsvps.csv')}
-                  className="flex items-center space-x-2 px-4 py-2 bg-white text-wedding-green-600 rounded-lg hover:bg-wedding-green-50 transition-colors"
+                  className="flex items-center justify-center space-x-2 px-3 sm:px-4 py-2 bg-white text-wedding-green-600 rounded-lg hover:bg-wedding-green-50 transition-colors text-sm"
                 >
-                  <DocumentArrowDownIcon className="w-5 h-5" />
+                  <DocumentArrowDownIcon className="w-4 h-4 sm:w-5 sm:h-5" />
                   <span>Exportar CSV</span>
                 </button>
               </div>
             </div>
             
             {/* Filtros e Estatísticas */}
-            <div className="px-6 py-4 bg-gray-50 border-b">
-              <div className="flex flex-wrap items-center justify-between gap-4">
+            <div className="px-4 sm:px-6 py-4 bg-gray-50 border-b">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 {/* Filtros por status */}
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-1 sm:gap-2">
                   <button
                     onClick={() => setStatusFilter('todos')}
-                    className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
+                    className={`px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium transition-colors ${
                       statusFilter === 'todos'
                         ? 'bg-wedding-green-600 text-white'
                         : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
@@ -268,38 +277,44 @@ export default function AdminPage() {
                   </button>
                   <button
                     onClick={() => setStatusFilter('confirmado')}
-                    className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
+                    className={`px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium transition-colors ${
                       statusFilter === 'confirmado'
                         ? 'bg-green-600 text-white'
                         : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                     }`}
                   >
-                    Confirmados ({getFilterStats().confirmados})
+                    <span className="hidden sm:inline">Confirmados</span>
+                    <span className="sm:hidden">Conf</span>
+                    <span className="ml-1">({getFilterStats().confirmados})</span>
                   </button>
                   <button
                     onClick={() => setStatusFilter('com_acompanhante')}
-                    className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
+                    className={`px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium transition-colors ${
                       statusFilter === 'com_acompanhante'
                         ? 'bg-blue-600 text-white'
                         : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                     }`}
                   >
-                    Com Acompanhante ({getFilterStats().comAcompanhante})
+                    <span className="hidden sm:inline">Com Acompanhante</span>
+                    <span className="sm:hidden">+1</span>
+                    <span className="ml-1">({getFilterStats().comAcompanhante})</span>
                   </button>
                   <button
                     onClick={() => setStatusFilter('nao_podera_ir')}
-                    className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
+                    className={`px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium transition-colors ${
                       statusFilter === 'nao_podera_ir'
                         ? 'bg-red-600 text-white'
                         : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                     }`}
                   >
-                    Não Poderão Ir ({getFilterStats().naoPoderao})
+                    <span className="hidden sm:inline">Não Poderão Ir</span>
+                    <span className="sm:hidden">Não</span>
+                    <span className="ml-1">({getFilterStats().naoPoderao})</span>
                   </button>
                 </div>
                 
                 {/* Contador de resultados filtrados */}
-                <div className="text-sm text-gray-600">
+                <div className="text-xs sm:text-sm text-gray-600">
                   Mostrando {filteredRSVPs.length} de {rsvpData.length} confirmações
                 </div>
               </div>
@@ -586,20 +601,21 @@ export default function AdminPage() {
             animate={{ opacity: 1, x: 0 }}
             className="bg-white rounded-xl shadow-lg overflow-hidden"
           >
-            <div className="px-6 py-4 bg-wedding-green-600 text-white">
-              <div className="flex justify-between items-center">
-                <h2 className="text-xl font-semibold">Mensagens dos Convidados</h2>
+            <div className="px-4 sm:px-6 py-4 bg-wedding-green-600 text-white">
+              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+                <h2 className="text-lg sm:text-xl font-semibold">Mensagens dos Convidados</h2>
                 <button
                   onClick={() => exportToCSV(guestMessages, 'mensagens.csv')}
-                  className="flex items-center space-x-2 px-4 py-2 bg-white text-wedding-green-600 rounded-lg hover:bg-wedding-green-50 transition-colors"
+                  className="flex items-center justify-center space-x-2 px-3 sm:px-4 py-2 bg-white text-wedding-green-600 rounded-lg hover:bg-wedding-green-50 transition-colors text-sm"
                 >
-                  <DocumentArrowDownIcon className="w-5 h-5" />
+                  <DocumentArrowDownIcon className="w-4 h-4 sm:w-5 sm:h-5" />
                   <span>Exportar CSV</span>
                 </button>
               </div>
             </div>
             
-            <div className="overflow-x-auto">
+            {/* Desktop Table */}
+            <div className="hidden md:block overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
@@ -634,6 +650,30 @@ export default function AdminPage() {
                   ))}
                 </tbody>
               </table>
+            </div>
+
+            {/* Mobile Cards */}
+            <div className="md:hidden">
+              {guestMessages.map((message, index) => (
+                <div key={index} className="border-b border-gray-200 p-4 hover:bg-gray-50">
+                  <div className="flex items-start justify-between mb-2">
+                    <h3 className="text-sm font-medium text-gray-900">{message.nome}</h3>
+                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                      message.tipo === 'RSVP' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'
+                    }`}>
+                      {message.tipo}
+                    </span>
+                  </div>
+                  <div className="mb-2">
+                    <p className="text-sm text-gray-600 break-words leading-relaxed">
+                      {message.observacoes}
+                    </p>
+                  </div>
+                  <div className="text-xs text-gray-500">
+                    {new Date(message.data_confirmacao).toLocaleDateString('pt-BR')}
+                  </div>
+                </div>
+              ))}
             </div>
           </motion.div>
         )}

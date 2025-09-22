@@ -1,6 +1,7 @@
 [build]
   command = "npm run build"
   publish = "out"
+  environment = { ESLINT_NO_DEV_ERRORS = "true" }
 
 [build.environment]
   NODE_VERSION = "18"

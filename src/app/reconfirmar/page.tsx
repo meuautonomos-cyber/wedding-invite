@@ -1,7 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { motion } from 'framer-motion'
+import Link from 'next/link'
 import { ReconfirmationService } from '@/lib/reconfirmationService'
 import { weddingData } from '@/data/weddingData'
 
@@ -24,9 +25,9 @@ export default function ReconfirmarPage() {
       setTicketId(id)
       loadReconfirmation(id)
     }
-  }, [])
+  }, [loadReconfirmation])
 
-  const loadReconfirmation = async (id: string) => {
+  const loadReconfirmation = useCallback(async (id: string) => {
     setLoading(true)
     try {
       const data = await reconfirmationService.getReconfirmationStatus(id)
@@ -36,7 +37,7 @@ export default function ReconfirmarPage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
 
   const handleReconfirmation = async (actionType: 'confirm' | 'cancel') => {
     if (!ticketId) return
@@ -113,12 +114,12 @@ export default function ReconfirmarPage() {
           <p className="text-wedding-olive-600 mb-6">
             Verifique se o link está correto ou entre em contato conosco.
           </p>
-          <a
+          <Link
             href="/"
             className="bg-gradient-to-r from-wedding-gold to-wedding-olive text-white px-6 py-3 rounded-xl font-medium hover:shadow-lg transition-all duration-300"
           >
             Voltar ao início
-          </a>
+          </Link>
         </div>
       </div>
     )
@@ -264,12 +265,12 @@ export default function ReconfirmarPage() {
 
           {/* Botão Voltar */}
           <div className="text-center mt-8">
-            <a
+            <Link
               href="/"
               className="text-wedding-olive-600 hover:text-wedding-gold transition-colors duration-300"
             >
               ← Voltar ao site
-            </a>
+            </Link>
           </div>
         </motion.div>
       </div>

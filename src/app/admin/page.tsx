@@ -7,15 +7,22 @@ import {
   UsersIcon,
   GiftIcon,
   DocumentArrowDownIcon,
-  PhoneIcon
+  PhoneIcon,
+  CheckCircleIcon,
+  XCircleIcon,
+  ClockIcon,
+  ChatBubbleLeftRightIcon
 } from '@heroicons/react/24/outline'
 
 export default function AdminPage() {
   const [rsvpData, setRsvpData] = useState<RSVPData[]>([])
   const [giftData, setGiftData] = useState<GiftData[]>([])
+  const [reconfirmationData, setReconfirmationData] = useState<any[]>([])
+  const [guestMessages, setGuestMessages] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
-  const [activeTab, setActiveTab] = useState<'rsvp' | 'gifts'>('rsvp')
+  const [activeTab, setActiveTab] = useState<'rsvp' | 'gifts' | 'reconfirmations' | 'messages'>('rsvp')
   const [statusFilter, setStatusFilter] = useState<'todos' | 'confirmado' | 'com_acompanhante' | 'nao_podera_ir'>('todos')
+  const [reconfirmationFilter, setReconfirmationFilter] = useState<'todos' | 'pendente' | 'confirmado' | 'desistiu' | 'taxa_paga'>('todos')
 
   useEffect(() => {
     loadData()
@@ -26,17 +33,23 @@ export default function AdminPage() {
     try {
       console.log('Admin - Carregando dados do Supabase...')
       
-      // Carregar RSVPs e presentes do Supabase
-      const [rsvpResponse, giftsResponse] = await Promise.all([
+      // Carregar todos os dados do Supabase
+      const [rsvpResponse, giftsResponse, reconfirmationResponse, messagesResponse] = await Promise.all([
         supabaseStorage.getAllRSVPs(),
-        supabaseStorage.getAllGifts()
+        supabaseStorage.getAllGifts(),
+        supabaseStorage.getAllReconfirmations(),
+        supabaseStorage.getGuestMessages()
       ])
       
       console.log('Admin - RSVPs carregados:', rsvpResponse.length)
       console.log('Admin - Presentes carregados:', giftsResponse.length)
+      console.log('Admin - Reconfirmações carregadas:', reconfirmationResponse.length)
+      console.log('Admin - Mensagens carregadas:', messagesResponse.length)
       
       setRsvpData(rsvpResponse)
       setGiftData(giftsResponse)
+      setReconfirmationData(reconfirmationResponse)
+      setGuestMessages(messagesResponse)
     } catch (error) {
       console.error('Erro ao carregar dados:', error)
       alert('Erro ao carregar dados do Supabase: ' + (error as Error).message)
@@ -79,6 +92,12 @@ export default function AdminPage() {
     return rsvp.status === statusFilter
   })
 
+  // Filtrar reconfirmações por status
+  const filteredReconfirmations = reconfirmationData.filter(reconf => {
+    if (reconfirmationFilter === 'todos') return true
+    return reconf.status === reconfirmationFilter
+  })
+
   // Estatísticas dos filtros
   const getFilterStats = () => {
     const total = rsvpData.length
@@ -87,6 +106,17 @@ export default function AdminPage() {
     const naoPoderao = rsvpData.filter(r => r.status === 'nao_podera_ir').length
     
     return { total, confirmados, comAcompanhante, naoPoderao }
+  }
+
+  // Estatísticas das reconfirmações
+  const getReconfirmationStats = () => {
+    const total = reconfirmationData.length
+    const pendentes = reconfirmationData.filter(r => r.status === 'pendente').length
+    const confirmados = reconfirmationData.filter(r => r.status === 'confirmado').length
+    const desistiram = reconfirmationData.filter(r => r.status === 'desistiu').length
+    const taxaPaga = reconfirmationData.filter(r => r.status === 'taxa_paga').length
+    
+    return { total, pendentes, confirmados, desistiram, taxaPaga }
   }
 
   // Atualizar status do presente
@@ -149,7 +179,7 @@ export default function AdminPage() {
         </div>
 
         {/* Tabs */}
-        <div className="flex space-x-2 mb-8">
+        <div className="flex flex-wrap gap-2 mb-8">
           <button
             onClick={() => setActiveTab('rsvp')}
             className={`px-4 py-2 rounded-lg font-medium transition-colors ${
@@ -171,6 +201,28 @@ export default function AdminPage() {
           >
             <GiftIcon className="w-5 h-5 inline mr-2" />
             Presentes ({giftData.length})
+          </button>
+          <button
+            onClick={() => setActiveTab('reconfirmations')}
+            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+              activeTab === 'reconfirmations'
+                ? 'bg-wedding-green-600 text-white'
+                : 'bg-white text-wedding-green-700 hover:bg-wedding-green-50'
+            }`}
+          >
+            <CheckCircleIcon className="w-5 h-5 inline mr-2" />
+            Reconfirmações ({reconfirmationData.length})
+          </button>
+          <button
+            onClick={() => setActiveTab('messages')}
+            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+              activeTab === 'messages'
+                ? 'bg-wedding-green-600 text-white'
+                : 'bg-white text-wedding-green-700 hover:bg-wedding-green-50'
+            }`}
+          >
+            <ChatBubbleLeftRightIcon className="w-5 h-5 inline mr-2" />
+            Mensagens ({guestMessages.length})
           </button>
           <a
             href="/admin/whatsapp"
@@ -382,6 +434,203 @@ export default function AdminPage() {
                             <span className="text-xs text-gray-400">Finalizado</span>
                           )}
                         </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </motion.div>
+        )}
+
+        {/* Reconfirmações Tab */}
+        {activeTab === 'reconfirmations' && (
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="bg-white rounded-xl shadow-lg overflow-hidden"
+          >
+            <div className="px-6 py-4 bg-wedding-green-600 text-white">
+              <div className="flex justify-between items-center">
+                <h2 className="text-xl font-semibold">Reconfirmações de Presença</h2>
+                <button
+                  onClick={() => exportToCSV(filteredReconfirmations, 'reconfirmacoes.csv')}
+                  className="flex items-center space-x-2 px-4 py-2 bg-white text-wedding-green-600 rounded-lg hover:bg-wedding-green-50 transition-colors"
+                >
+                  <DocumentArrowDownIcon className="w-5 h-5" />
+                  <span>Exportar CSV</span>
+                </button>
+              </div>
+            </div>
+            
+            {/* Filtros e Estatísticas */}
+            <div className="px-6 py-4 bg-gray-50 border-b">
+              <div className="flex flex-wrap items-center justify-between gap-4">
+                {/* Filtros por status */}
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    onClick={() => setReconfirmationFilter('todos')}
+                    className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
+                      reconfirmationFilter === 'todos'
+                        ? 'bg-wedding-green-600 text-white'
+                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    }`}
+                  >
+                    Todos ({getReconfirmationStats().total})
+                  </button>
+                  <button
+                    onClick={() => setReconfirmationFilter('pendente')}
+                    className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
+                      reconfirmationFilter === 'pendente'
+                        ? 'bg-yellow-600 text-white'
+                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    }`}
+                  >
+                    Pendentes ({getReconfirmationStats().pendentes})
+                  </button>
+                  <button
+                    onClick={() => setReconfirmationFilter('confirmado')}
+                    className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
+                      reconfirmationFilter === 'confirmado'
+                        ? 'bg-green-600 text-white'
+                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    }`}
+                  >
+                    Confirmados ({getReconfirmationStats().confirmados})
+                  </button>
+                  <button
+                    onClick={() => setReconfirmationFilter('desistiu')}
+                    className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
+                      reconfirmationFilter === 'desistiu'
+                        ? 'bg-red-600 text-white'
+                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    }`}
+                  >
+                    Desistiram ({getReconfirmationStats().desistiram})
+                  </button>
+                  <button
+                    onClick={() => setReconfirmationFilter('taxa_paga')}
+                    className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
+                      reconfirmationFilter === 'taxa_paga'
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    }`}
+                  >
+                    Taxa Paga ({getReconfirmationStats().taxaPaga})
+                  </button>
+                </div>
+                
+                {/* Contador de resultados filtrados */}
+                <div className="text-sm text-gray-600">
+                  Mostrando {filteredReconfirmations.length} de {reconfirmationData.length} reconfirmações
+                </div>
+              </div>
+            </div>
+            
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nome</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Telefone</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data Limite</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Reconfirmação</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Taxa</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Observações</th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {filteredReconfirmations.map((reconf, index) => (
+                    <tr key={index} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        {reconf.nome}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {reconf.telefone}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                          reconf.status === 'pendente' ? 'bg-yellow-100 text-yellow-800' :
+                          reconf.status === 'confirmado' ? 'bg-green-100 text-green-800' :
+                          reconf.status === 'desistiu' ? 'bg-red-100 text-red-800' :
+                          'bg-blue-100 text-blue-800'
+                        }`}>
+                          {reconf.status === 'pendente' ? 'Pendente' :
+                           reconf.status === 'confirmado' ? 'Confirmado' :
+                           reconf.status === 'desistiu' ? 'Desistiu' : 'Taxa Paga'}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {new Date(reconf.data_limite).toLocaleDateString('pt-BR')}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {reconf.data_reconfirmacao ? new Date(reconf.data_reconfirmacao).toLocaleDateString('pt-BR') : '-'}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {reconf.taxa_paga ? 'R$ 150,00' : '-'}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">
+                        {reconf.observacoes || '-'}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </motion.div>
+        )}
+
+        {/* Mensagens Tab */}
+        {activeTab === 'messages' && (
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="bg-white rounded-xl shadow-lg overflow-hidden"
+          >
+            <div className="px-6 py-4 bg-wedding-green-600 text-white">
+              <div className="flex justify-between items-center">
+                <h2 className="text-xl font-semibold">Mensagens dos Convidados</h2>
+                <button
+                  onClick={() => exportToCSV(guestMessages, 'mensagens.csv')}
+                  className="flex items-center space-x-2 px-4 py-2 bg-white text-wedding-green-600 rounded-lg hover:bg-wedding-green-50 transition-colors"
+                >
+                  <DocumentArrowDownIcon className="w-5 h-5" />
+                  <span>Exportar CSV</span>
+                </button>
+              </div>
+            </div>
+            
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nome</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mensagem</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data</th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {guestMessages.map((message, index) => (
+                    <tr key={index} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        {message.nome}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                          message.tipo === 'RSVP' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'
+                        }`}>
+                          {message.tipo}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-500 max-w-md">
+                        <div className="break-words">
+                          {message.observacoes}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {new Date(message.data_confirmacao).toLocaleDateString('pt-BR')}
                       </td>
                     </tr>
                   ))}

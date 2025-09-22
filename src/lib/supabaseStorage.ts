@@ -492,6 +492,348 @@ class SupabaseStorage {
       }
     }
   }
+
+  // Funções para lembretes
+  async createReminders(reminders: any[]): Promise<boolean> {
+    try {
+      const { error } = await supabase
+        .from('wedding_reminders')
+        .insert(reminders)
+
+      if (error) {
+        console.error('Erro ao criar lembretes:', error)
+        return false
+      }
+
+      return true
+    } catch (error) {
+      console.error('Erro ao criar lembretes:', error)
+      return false
+    }
+  }
+
+  async getPendingReminders(): Promise<any[]> {
+    try {
+      const { data, error } = await supabase
+        .from('wedding_reminders')
+        .select('*')
+        .eq('status', 'pendente')
+        .lte('proximo_envio', new Date().toISOString())
+
+      if (error) {
+        console.error('Erro ao buscar lembretes pendentes:', error)
+        return []
+      }
+
+      return data || []
+    } catch (error) {
+      console.error('Erro ao buscar lembretes pendentes:', error)
+      return []
+    }
+  }
+
+  async updateReminderStatus(id: string, status: string, data?: any): Promise<boolean> {
+    try {
+      const updateData: any = { status }
+      if (data) {
+        Object.assign(updateData, data)
+      }
+
+      const { error } = await supabase
+        .from('wedding_reminders')
+        .update(updateData)
+        .eq('id', id)
+
+      if (error) {
+        console.error('Erro ao atualizar status do lembrete:', error)
+        return false
+      }
+
+      return true
+    } catch (error) {
+      console.error('Erro ao atualizar status do lembrete:', error)
+      return false
+    }
+  }
+
+  async getNextReminder(ticketId: string): Promise<any> {
+    try {
+      const { data, error } = await supabase
+        .from('wedding_reminders')
+        .select('*')
+        .eq('ticket_id', ticketId)
+        .eq('status', 'pendente')
+        .order('proximo_envio', { ascending: true })
+        .limit(1)
+        .single()
+
+      if (error) {
+        console.error('Erro ao buscar próximo lembrete:', error)
+        return null
+      }
+
+      return data
+    } catch (error) {
+      console.error('Erro ao buscar próximo lembrete:', error)
+      return null
+    }
+  }
+
+  async updateReminderNextSend(id: string, proximoEnvio: string): Promise<boolean> {
+    try {
+      const { error } = await supabase
+        .from('wedding_reminders')
+        .update({ proximo_envio: proximoEnvio })
+        .eq('id', id)
+
+      if (error) {
+        console.error('Erro ao atualizar próximo envio:', error)
+        return false
+      }
+
+      return true
+    } catch (error) {
+      console.error('Erro ao atualizar próximo envio:', error)
+      return false
+    }
+  }
+
+  // Funções para reconfirmação
+  async getConfirmedGuests(): Promise<any[]> {
+    try {
+      const { data, error } = await supabase
+        .from('wedding_tickets')
+        .select('*')
+        .in('status', ['confirmado', 'com_acompanhante'])
+
+      if (error) {
+        console.error('Erro ao buscar convidados confirmados:', error)
+        return []
+      }
+
+      return data || []
+    } catch (error) {
+      console.error('Erro ao buscar convidados confirmados:', error)
+      return []
+    }
+  }
+
+  async createReconfirmations(reconfirmations: any[]): Promise<boolean> {
+    try {
+      const { error } = await supabase
+        .from('wedding_reconfirmations')
+        .insert(reconfirmations)
+
+      if (error) {
+        if (error.code === 'PGRST116' || error.message?.includes('relation "wedding_reconfirmations" does not exist')) {
+          console.log('Tabela wedding_reconfirmations não existe. Execute o schema SQL primeiro.')
+          return false
+        }
+        console.error('Erro ao criar reconfirmações:', error)
+        return false
+      }
+
+      return true
+    } catch (error) {
+      console.error('Erro ao criar reconfirmações:', error)
+      return false
+    }
+  }
+
+  async getPendingReconfirmations(): Promise<any[]> {
+    try {
+      const { data, error } = await supabase
+        .from('wedding_reconfirmations')
+        .select('*')
+        .eq('status', 'pendente')
+
+      if (error) {
+        if (error.code === 'PGRST116' || error.message?.includes('relation "wedding_reconfirmations" does not exist')) {
+          console.log('Tabela wedding_reconfirmations não existe. Execute o schema SQL primeiro.')
+          return []
+        }
+        console.error('Erro ao buscar reconfirmações pendentes:', error)
+        return []
+      }
+
+      return data || []
+    } catch (error) {
+      console.error('Erro ao buscar reconfirmações pendentes:', error)
+      return []
+    }
+  }
+
+  async getReconfirmationByTicketId(ticketId: string): Promise<any> {
+    try {
+      const { data, error } = await supabase
+        .from('wedding_reconfirmations')
+        .select('*')
+        .eq('ticket_id', ticketId)
+        .single()
+
+      if (error) {
+        // Se a tabela não existe, retorna null sem erro
+        if (error.code === 'PGRST116' || error.message?.includes('relation "wedding_reconfirmations" does not exist')) {
+          console.log('Tabela wedding_reconfirmations não existe. Execute o schema SQL primeiro.')
+          return null
+        }
+        console.error('Erro ao buscar reconfirmação:', error)
+        return null
+      }
+
+      return data
+    } catch (error) {
+      console.error('Erro ao buscar reconfirmação:', error)
+      return null
+    }
+  }
+
+  async updateReconfirmationStatus(ticketId: string, status: string, data?: any): Promise<boolean> {
+    try {
+      const updateData: any = { status }
+      if (data) {
+        Object.assign(updateData, data)
+      }
+
+      const { error } = await supabase
+        .from('wedding_reconfirmations')
+        .update(updateData)
+        .eq('ticket_id', ticketId)
+
+      if (error) {
+        if (error.code === 'PGRST116' || error.message?.includes('relation "wedding_reconfirmations" does not exist')) {
+          console.log('Tabela wedding_reconfirmations não existe. Execute o schema SQL primeiro.')
+          return false
+        }
+        console.error('Erro ao atualizar status da reconfirmação:', error)
+        return false
+      }
+
+      return true
+    } catch (error) {
+      console.error('Erro ao atualizar status da reconfirmação:', error)
+      return false
+    }
+  }
+
+  async createReconfirmationNotification(notification: any): Promise<boolean> {
+    try {
+      const { error } = await supabase
+        .from('wedding_reconfirmation_notifications')
+        .insert(notification)
+
+      if (error) {
+        if (error.code === 'PGRST116' || error.message?.includes('relation "wedding_reconfirmation_notifications" does not exist')) {
+          console.log('Tabela wedding_reconfirmation_notifications não existe. Execute o schema SQL primeiro.')
+          return false
+        }
+        console.error('Erro ao criar notificação de reconfirmação:', error)
+        return false
+      }
+
+      return true
+    } catch (error) {
+      console.error('Erro ao criar notificação de reconfirmação:', error)
+      return false
+    }
+  }
+
+  // Funções para o painel admin
+  async getAllReconfirmations(): Promise<any[]> {
+    try {
+      const { data, error } = await supabase
+        .from('wedding_reconfirmations')
+        .select('*')
+        .order('created_at', { ascending: false })
+
+      if (error) {
+        if (error.code === 'PGRST116' || error.message?.includes('relation "wedding_reconfirmations" does not exist')) {
+          console.log('Tabela wedding_reconfirmations não existe. Execute o schema SQL primeiro.')
+          return []
+        }
+        console.error('Erro ao buscar reconfirmações:', error)
+        return []
+      }
+
+      return data || []
+    } catch (error) {
+      console.error('Erro ao buscar reconfirmações:', error)
+      return []
+    }
+  }
+
+  async getReconfirmationNotifications(): Promise<any[]> {
+    try {
+      const { data, error } = await supabase
+        .from('wedding_reconfirmation_notifications')
+        .select('*')
+        .order('enviada_em', { ascending: false })
+
+      if (error) {
+        if (error.code === 'PGRST116' || error.message?.includes('relation "wedding_reconfirmation_notifications" does not exist')) {
+          console.log('Tabela wedding_reconfirmation_notifications não existe. Execute o schema SQL primeiro.')
+          return []
+        }
+        console.error('Erro ao buscar notificações de reconfirmação:', error)
+        return []
+      }
+
+      return data || []
+    } catch (error) {
+      console.error('Erro ao buscar notificações de reconfirmação:', error)
+      return []
+    }
+  }
+
+  async getGuestMessages(): Promise<any[]> {
+    try {
+      // Buscar mensagens dos RSVPs
+      const { data: rsvpMessages, error: rsvpError } = await supabase
+        .from('wedding_rsvp')
+        .select('nome, observacoes, data_confirmacao')
+        .not('observacoes', 'is', null)
+        .neq('observacoes', '')
+        .neq('observacoes', 'EMPTY')
+
+      if (rsvpError) {
+        console.error('Erro ao buscar mensagens dos RSVPs:', rsvpError)
+      }
+
+      // Buscar mensagens dos tickets
+      const { data: ticketMessages, error: ticketError } = await supabase
+        .from('wedding_tickets')
+        .select('nome, observacoes, data_confirmacao')
+        .not('observacoes', 'is', null)
+        .neq('observacoes', '')
+        .neq('observacoes', 'EMPTY')
+
+      if (ticketError) {
+        console.error('Erro ao buscar mensagens dos tickets:', ticketError)
+      }
+
+      // Combinar e formatar mensagens
+      const allMessages = [
+        ...(rsvpMessages || []).map(msg => ({
+          ...msg,
+          tipo: 'RSVP',
+          origem: 'wedding_rsvp'
+        })),
+        ...(ticketMessages || []).map(msg => ({
+          ...msg,
+          tipo: 'Ticket',
+          origem: 'wedding_tickets'
+        }))
+      ]
+
+      // Ordenar por data
+      return allMessages.sort((a, b) => 
+        new Date(b.data_confirmacao).getTime() - new Date(a.data_confirmacao).getTime()
+      )
+    } catch (error) {
+      console.error('Erro ao buscar mensagens dos convidados:', error)
+      return []
+    }
+  }
 }
 
 export const supabaseStorage = new SupabaseStorage()

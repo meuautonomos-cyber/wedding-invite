@@ -180,7 +180,6 @@ export default function PresentesPage() {
           </p>
         </motion.div>
 
-
         {/* Etapa 1: Categorias de Presentes */}
         {currentStep === 1 && (
           <motion.section
@@ -224,6 +223,72 @@ export default function PresentesPage() {
                   </motion.button>
                 )
               })}
+            </div>
+          </motion.section>
+        )}
+
+        {/* Lista Completa de Presentes - Nossa Casa */}
+        {currentStep === 2 && selectedCategory === 'casa' && (
+          <motion.section
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="mb-12"
+          >
+            <div className="bg-white rounded-3xl p-8 shadow-xl border border-wedding-ring/20 overflow-hidden relative">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-wedding-gold/5 to-wedding-olive/5 rounded-full -translate-y-32 translate-x-32"></div>
+              <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-wedding-cream/10 to-wedding-gold/10 rounded-full translate-y-24 -translate-x-24"></div>
+              
+              <div className="relative z-10">
+                <h3 className="text-3xl font-script text-wedding-olive-800 text-center mb-8">
+                  Nossa Casa
+                </h3>
+                <p className="text-wedding-olive-600 text-center mb-8 text-lg">
+                  Itens para montarmos nosso lar. Escolha um presente abaixo:
+                </p>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 md:gap-6">
+                  {lista_presentes.itens.map((item, index) => (
+                    <motion.div
+                      key={index}
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ duration: 0.45, delay: index * 0.03 }}
+                      className="presente-card bg-white rounded-2xl p-4 md:p-5 shadow-lg border border-wedding-ring/20 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 group"
+                    >
+                      {/* Container da imagem com tamanho fixo e responsivo */}
+                      <div className="presente-image-wrapper mb-4">
+                        <img
+                          src={item.imagem}
+                          alt={item.nome}
+                          onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/images/layout-principal.png' }}
+                          loading="lazy"
+                        />
+                        {/* Overlay sutil no hover */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                      </div>
+                      
+                      {/* Conteúdo do card */}
+                      <div className="space-y-3">
+                        <h4 className="font-semibold text-wedding-olive-800 text-sm md:text-base line-clamp-2 min-h-[2.5rem] flex items-center">
+                          {item.nome}
+                        </h4>
+                        <p className="text-wedding-gold font-bold text-lg md:text-xl">
+                          {formatCurrency(item.valor)}
+                        </p>
+                        <a
+                          href={item.link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="w-full bg-gradient-to-r from-wedding-gold to-wedding-olive text-white py-2.5 md:py-3 px-3 md:px-4 rounded-xl font-medium hover:shadow-lg transition-all duration-300 text-center block text-sm md:text-base"
+                        >
+                          Presentear
+                        </a>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
             </div>
           </motion.section>
         )}
@@ -444,36 +509,36 @@ export default function PresentesPage() {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="mb-12"
           >
-            <h3 className="text-2xl font-script text-wedding-green-800 text-center mb-8">
+            <h3 className="text-3xl font-script text-wedding-olive-800 text-center mb-8">
               Lista de Presentes
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {lista_presentes.itens.map((item, index) => (
                 <motion.div
                   key={index}
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                  className="card"
+                  transition={{ duration: 0.5, delay: index * 0.05 }}
+                  className="bg-white rounded-2xl p-6 shadow-lg border border-wedding-ring/20 hover:shadow-xl transition-all duration-300"
                 >
-                  <div className="aspect-square bg-wedding-cream-200 rounded-lg mb-4 overflow-hidden">
+                  <div className="aspect-square bg-wedding-cream-100 rounded-xl mb-4 overflow-hidden">
                     <img
                       src={item.imagem}
                       alt={item.nome}
                       className="w-full h-full object-cover"
                     />
                   </div>
-                  <h4 className="font-semibold text-wedding-green-800 mb-2">
+                  <h4 className="font-semibold text-wedding-olive-800 mb-2 text-lg">
                     {item.nome}
                   </h4>
-                  <p className="text-wedding-green-600 font-semibold mb-4">
+                  <p className="text-wedding-gold font-bold mb-4 text-xl">
                     {formatCurrency(item.valor)}
                   </p>
                   <a
                     href={item.link}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="btn-primary w-full text-center"
+                    className="w-full bg-gradient-to-r from-wedding-gold to-wedding-olive text-white py-3 px-4 rounded-xl font-medium hover:shadow-lg transition-all duration-300 text-center block"
                   >
                     Presentear
                   </a>

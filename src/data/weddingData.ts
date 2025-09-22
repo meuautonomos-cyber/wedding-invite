@@ -34,12 +34,63 @@ export const weddingData: WeddingData = {
         link: "https://nubank.com.br/cobrar/zf8yn/68c8e7c6-8563-47e5-9400-39ac8077affa"
       },
       itens: [
-        {
-          nome: "Panela de pressão",
-          valor: 199.90,
-          imagem: "/images/itens/panela.jpg",
-          link: "https://loja.com/panela"
-        }
+        // ELETRODOMÉSTICOS CAROS (Prioridade 1)
+        { nome: "Smart TV", valor: 2000, imagem: "/images/itens/Smart Tv 50 Polegadas.webp", link: "https://mercadolivre.com/sec/1jaff8k" },
+        { nome: "Máquina de Lavar", valor: 1500, imagem: "/images/itens/Maquina de Lavar.webp", link: "https://mercadolivre.com/sec/32siZuq" },
+        { nome: "Robô Aspirador de Pó", valor: 800, imagem: "/images/itens/Aspirador de Pó Robô.webp", link: "https://mercadolivre.com/sec/1pdsqFp" },
+        { nome: "Aspirador de Pó Vertical", valor: 400, imagem: "/images/itens/Aspirador de Pó Vertical.webp", link: "https://mercadolivre.com/sec/18fYNWW" },
+        { nome: "Micro-ondas", valor: 300, imagem: "/images/itens/Micro-Ondas.webp", link: "https://mercadolivre.com/sec/2gGDJiH" },
+        
+        // COZINHA CARA (Prioridade 2)
+        { nome: "Fritadeira sem óleo (Airfryer)", valor: 400, imagem: "/images/itens/Fritadeira Digital Clear - Air Fryer.webp", link: "https://mercadolivre.com/sec/1jDdXWD" },
+        { nome: "Jogo de panelas antiaderentes/inox", valor: 300, imagem: "/images/itens/Panelas Ceramico.webp", link: "https://mercadolivre.com/sec/2usVbzq" },
+        { nome: "Conjunto de travessas de vidro/cerâmica", valor: 250, imagem: "/images/itens/Kit Travessas.webp", link: "https://mercadolivre.com/sec/26av8p9" },
+        { nome: "Jogo de cama (lençóis, fronhas, edredom)", valor: 200, imagem: "/images/itens/Conjunto de Cama.webp", link: "https://mercadolivre.com/sec/2NXLpcs" },
+        
+        // COZINHA MÉDIA (Prioridade 3)
+        { nome: "Batedeira", valor: 150, imagem: "/images/itens/Batedeira.webp", link: "https://mercadolivre.com/sec/2frVCiG" },
+        { nome: "Liquidificador", valor: 120, imagem: "/images/itens/Liquidificador.webp", link: "https://mercadolivre.com/sec/1SoRVx2" },
+        { nome: "Mixer 3 em 1", valor: 100, imagem: "/images/itens/Mixer 3 em 1.webp", link: "https://mercadolivre.com/sec/1JScTpa" },
+        { nome: "Panela elétrica de arroz", valor: 80, imagem: "/images/itens/Panela de Arroz Elétrica.webp", link: "https://mercadolivre.com/sec/2MXn8XZ" },
+        { nome: "Conjunto de formas para bolo e assadeira", valor: 60, imagem: "/images/itens/Conjunto de Forma para Bolos.webp", link: "https://mercadolivre.com/sec/2rfXnPM" },
+        
+        // MESA E DECORAÇÃO (Prioridade 4)
+        { nome: "Jogo de pratos", valor: 80, imagem: "/images/itens/Jogo de Prato Rasos.webp", link: "https://mercadolivre.com/sec/15kfbN3" },
+        { nome: "Jogo de Talheres", valor: 60, imagem: "/images/itens/Jogo de Talheres.webp", link: "https://mercadolivre.com/sec/1VpEqxE" },
+        { nome: "Conjunto de copos", valor: 50, imagem: "/images/itens/Conjunto de Copos.webp", link: "https://mercadolivre.com/sec/1bwH3eF" },
+        { nome: "Colcha ou cobre-leito", valor: 80, imagem: "/images/itens/Colcha.webp", link: "https://mercadolivre.com/sec/2Pk99ys" },
+        { nome: "Travesseiros", valor: 60, imagem: "/images/itens/Travesseiros.webp", link: "https://mercadolivre.com/sec/1piNg8B" },
+        { nome: "Cortinas", valor: 100, imagem: "/images/itens/Cortinas.webp", link: "https://mercadolivre.com/sec/1CwNdqD" },
+        { nome: "Estante para Livros", valor: 120, imagem: "/images/itens/Estante para Livros.webp", link: "https://mercadolivre.com/sec/1tnwT39" },
+        
+        // COZINHA BÁSICA (Prioridade 5)
+        { nome: "Torradeira", valor: 50, imagem: "/images/itens/Torradeira Eletrica.webp", link: "https://mercadolivre.com/sec/2RJhMuX" },
+        { nome: "Sanduicheira/grill", valor: 40, imagem: "/images/itens/Sanduicheira Grill.webp", link: "https://mercadolivre.com/sec/19tYLWx" },
+        { nome: "Conjunto de facas", valor: 30, imagem: "/images/itens/Conjunto de Facas.webp", link: "https://mercadolivre.com/sec/19LNmft" },
+        { nome: "Jogo de potes herméticos para mantimentos", valor: 40, imagem: "/images/itens/Jogo de potes Herméticos.webp", link: "https://mercadolivre.com/sec/2P9bHYg" },
+        { nome: "Jogo Tapete Cozinha", valor: 25, imagem: "/images/itens/Tapetes Cozinha.webp", link: "https://mercadolivre.com/sec/1AeuNjb" },
+        
+        // BANHEIRO E ORGANIZAÇÃO (Prioridade 6)
+        { nome: "Jogo de Toalhas", valor: 60, imagem: "/images/itens/Jogo de Toalhas.webp", link: "https://mercadolivre.com/sec/14QL9NG" },
+        { nome: "Roupões de casal", valor: 80, imagem: "/images/itens/Roupões de Casal.webp", link: "https://mercadolivre.com/sec/27xRcLL" },
+        { nome: "Kit de higiene (porta-sabonete, escova, etc.)", valor: 40, imagem: "/images/itens/Kit de Higiene.webp", link: "https://mercadolivre.com/sec/1DPEiFu" },
+        { nome: "Kit organizadores de guarda-roupa", valor: 50, imagem: "/images/itens/Kit Organizador.webp", link: "https://mercadolivre.com/sec/23LXFht" },
+        
+        // DECORAÇÃO E ACESSÓRIOS (Prioridade 7)
+        { nome: "Almofadas decorativas", valor: 30, imagem: "/images/itens/Kit Almofadas.webp", link: "https://mercadolivre.com/sec/16vMCgZ" },
+        { nome: "Manta aconchegante", valor: 40, imagem: "/images/itens/Manta Aconchegante.webp", link: "https://mercadolivre.com/sec/1B8XRBh" },
+        { nome: "Tapetes antiderrapantes", valor: 25, imagem: "/images/itens/Tapate Antiaderrente.webp", link: "https://mercadolivre.com/sec/1FKWkrJ" },
+        
+        // MESA E ACESSÓRIOS (Prioridade 8)
+        { nome: "Jogo Americano", valor: 20, imagem: "/images/itens/Jogo Americano.webp", link: "https://mercadolivre.com/sec/2sytDNj" },
+        { nome: "Travessas Retangular", valor: 15, imagem: "/images/itens/Travessa de Vidro.webp", link: "https://mercadolivre.com/sec/2xcp8oD" },
+        { nome: "Jarra de suco/água", valor: 25, imagem: "/images/itens/Jarra de Suco.webp", link: "https://mercadolivre.com/sec/1j4AAFa" },
+        { nome: "Garrafa térmica para café/chá", valor: 30, imagem: "/images/itens/Garrafa Termica Café.webp", link: "https://mercadolivre.com/sec/1k75wCy" },
+        { nome: "Jogo de Xícaras", valor: 20, imagem: "/images/itens/Jogo de Xicaras.webp", link: "https://mercadolivre.com/sec/28yi7aT" },
+        
+        // ELETRODOMÉSTICOS BÁSICOS (Prioridade 9)
+        { nome: "Ventilador", valor: 80, imagem: "/images/itens/Ventilador.webp", link: "https://mercadolivre.com/sec/2GYR7oM" },
+        { nome: "Ferro de Passar", valor: 60, imagem: "/images/itens/Ferro de Passar.webp", link: "https://mercadolivre.com/sec/1NdYDhp" }
       ]
     },
     rsvp: {
@@ -48,7 +99,7 @@ export const weddingData: WeddingData = {
       mensagem_pos_confirmacao: "Obrigado! Estamos contando os dias."
     },
     seo: {
-      title: "Anthony & Esther — 21/03/26, 16h",
+      title: "Anthony & Esther — 21/03/26, 15:30h",
       description: "Nosso convite de casamento. Confirme presença, veja o local e a lista de presentes.",
       og_image: "/images/og-image.jpg"
     }
@@ -62,7 +113,7 @@ export const timeline: TimelineEvent[] = [
     descricao: "Chegada dos convidados e welcome drink"
   },
   {
-    hora: "16:00",
+    hora: "15:30",
     evento: "Cerimônia de Casamento",
     descricao: "Celebração do casamento"
   },

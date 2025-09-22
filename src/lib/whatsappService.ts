@@ -1,5 +1,6 @@
 import { weddingData } from '@/data/weddingData'
 import { supabaseStorage } from './supabaseStorage'
+import { ReminderService } from './reminderService'
 import QRCode from 'qrcode'
 
 interface WhatsAppMessageData {
@@ -22,9 +23,11 @@ interface PresenteItem {
 
 export class WhatsAppService {
   private readonly baseUrl: string
+  private readonly reminderService: ReminderService
 
   constructor(baseUrl: string = 'http://localhost:3000') {
     this.baseUrl = baseUrl
+    this.reminderService = new ReminderService(baseUrl)
   }
 
   // Lista de presentes com valores e prioridades
@@ -112,8 +115,8 @@ export class WhatsAppService {
   // Sistema inteligente de sugestão de presentes
   private async getSmartPresenteSuggestions(ticketId: string): Promise<PresenteItem[]> {
     try {
-      // Buscar presentes já sugeridos para este ticket
-      const suggestedPresentes = await this.getSuggestedPresentesForTicket(ticketId)
+      // Buscar presentes já sugeridos GLOBALMENTE (para evitar repetições entre pessoas)
+      const allSuggestedPresentes = await supabaseStorage.getAllSuggestedPresentes()
       
       // Obter todos os presentes ordenados por prioridade
       const allPresentes = this.getPresentesList().sort((a, b) => {
@@ -123,9 +126,9 @@ export class WhatsAppService {
         return (b.valor || 0) - (a.valor || 0)
       })
       
-      // Filtrar presentes já sugeridos
+      // Filtrar presentes já sugeridos GLOBALMENTE
       const availablePresentes = allPresentes.filter(presente => 
-        !suggestedPresentes.some(suggested => suggested.nome === presente.nome)
+        !allSuggestedPresentes.includes(presente.nome)
       )
       
       // Se ainda há presentes disponíveis, sugerir APENAS 1 presente por pessoa
@@ -313,6 +316,18 @@ export class WhatsAppService {
       if (response.ok) {
         const result = await response.json()
         console.log('✅ API retornou sucesso:', result)
+        
+        // Criar lembretes automáticos para o convidado
+        try {
+          await this.reminderService.createRemindersForGuest(
+            data.ticketId, 
+            data.nome, 
+            data.telefone
+          )
+          console.log('📅 Lembretes criados para:', data.nome)
+        } catch (error) {
+          console.error('Erro ao criar lembretes:', error)
+        }
         
         // Se a API retornou sucesso, abrir WhatsApp Web automaticamente
         if (result.whatsappUrl) {

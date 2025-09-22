@@ -56,7 +56,7 @@ export default function SEO({
             '@type': 'Event',
             name: title,
             description: description,
-            startDate: '2026-03-21T16:00:00-03:00',
+            startDate: '2026-03-21T15:30:00-03:00',
             endDate: '2026-03-21T20:00:00-03:00',
             location: {
               '@type': 'Place',

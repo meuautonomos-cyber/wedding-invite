@@ -1,11 +1,11 @@
 [build]
   command = "npm run build"
   publish = "out"
-  environment = { ESLINT_NO_DEV_ERRORS = "true" }
 
 [build.environment]
   NODE_VERSION = "18"
   SECRETS_SCAN_ENABLED = "false"
+  ESLINT_NO_DEV_ERRORS = "true"
 
 [functions]
   directory = "netlify/functions"

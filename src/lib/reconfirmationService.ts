@@ -27,11 +27,15 @@ interface ReconfirmationNotification {
 
 export class ReconfirmationService {
   private readonly baseUrl: string
-  private readonly zApiUrl: string
+  private readonly wapiUrl: string
+  private readonly wapiToken: string
+  private readonly wapiInstanceId: string
 
-  constructor(baseUrl: string = 'http://localhost:3000', zApiUrl: string = 'http://localhost:3001') {
+  constructor(baseUrl: string = 'http://localhost:3000') {
     this.baseUrl = baseUrl
-    this.zApiUrl = zApiUrl
+    this.wapiUrl = process.env.NEXT_PUBLIC_WAPI_BASE_URL || 'https://api.w-api.app'
+    this.wapiToken = process.env.NEXT_PUBLIC_WAPI_TOKEN || 'iraQjMkKP80u84RuNVueGqqNS4hlExaM'
+    this.wapiInstanceId = process.env.NEXT_PUBLIC_WAPI_INSTANCE_ID || 'LITE-QX34ES-9ZAQOP'
   }
 
   // Calcular data limite para reconfirmação (21/02/2026)
@@ -113,15 +117,16 @@ export class ReconfirmationService {
         tipo = 'confirmacao_obrigatoria'
       }
 
-      // Enviar via Z-API
-      const response = await fetch(`${this.zApiUrl}/send-message`, {
+      // Enviar via W-API
+      const response = await fetch(`${this.wapiUrl}/message/sendText/${this.wapiInstanceId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${this.wapiToken}`
         },
         body: JSON.stringify({
-          phone: reconfirmation.telefone,
-          message: mensagem
+          number: reconfirmation.telefone,
+          text: mensagem
         })
       })
 

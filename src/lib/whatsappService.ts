@@ -23,10 +23,16 @@ interface PresenteItem {
 
 export class WhatsAppService {
   private readonly baseUrl: string
+  private readonly wapiUrl: string
+  private readonly wapiToken: string
+  private readonly wapiInstanceId: string
   private readonly reminderService: ReminderService
 
   constructor(baseUrl: string = 'http://localhost:3000') {
     this.baseUrl = baseUrl
+    this.wapiUrl = process.env.NEXT_PUBLIC_WAPI_BASE_URL || 'https://api.w-api.app'
+    this.wapiToken = process.env.NEXT_PUBLIC_WAPI_TOKEN || ''
+    this.wapiInstanceId = process.env.NEXT_PUBLIC_WAPI_INSTANCE_ID || ''
     this.reminderService = new ReminderService(baseUrl)
   }
 
@@ -277,29 +283,27 @@ export class WhatsAppService {
     }
   }
 
-  // Enviar via API (quando implementar servidor)
+  // Enviar via W-API
   async sendViaAPI(data: WhatsAppMessageData): Promise<boolean> {
     try {
       const message = await this.generateMessage(data)
-      const qrCode = await this.generateQRCode(data.ticketId)
       
-      // CORRIGIDO: Enviar para a PESSOA que se cadastrou
-      const response = await fetch('/api/whatsapp/send', {
+      // Enviar mensagem via W-API
+      const response = await fetch(`${this.wapiUrl}/message/sendText/${this.wapiInstanceId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${this.wapiToken}`
         },
         body: JSON.stringify({
-          to: `55${data.telefone}`, // Telefone da pessoa que se cadastrou
-          message,
-          qrCode,
-          ticketId: data.ticketId
+          number: `55${data.telefone}`,
+          text: message
         })
       })
       
       if (response.ok) {
         const result = await response.json()
-        console.log('✅ API retornou sucesso:', result)
+        console.log('✅ W-API retornou sucesso:', result)
         
         // Criar lembretes automáticos para o convidado
         try {
@@ -313,17 +317,17 @@ export class WhatsAppService {
           console.error('Erro ao criar lembretes:', error)
         }
         
-        // Se a API retornou sucesso, abrir WhatsApp Web automaticamente
-        if (result.whatsappUrl) {
-          console.log('🔗 Abrindo WhatsApp Web...')
-          window.open(result.whatsappUrl, '_blank')
-          return true
-        }
+        // Abrir WhatsApp Web com a mensagem
+        const whatsappUrl = `https://web.whatsapp.com/send?phone=55${data.telefone}&text=${encodeURIComponent(message)}`
+        console.log('🔗 Abrindo WhatsApp Web...')
+        window.open(whatsappUrl, '_blank')
+        return true
+      } else {
+        console.error('❌ Erro na W-API:', await response.text())
+        return false
       }
-      
-      return false
     } catch (error) {
-      console.error('Erro ao enviar via API:', error)
+      console.error('Erro ao enviar via W-API:', error)
       return false
     }
   }

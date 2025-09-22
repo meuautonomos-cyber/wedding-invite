@@ -6,6 +6,9 @@
   NODE_VERSION = "18"
   SECRETS_SCAN_ENABLED = "false"
   ESLINT_NO_DEV_ERRORS = "true"
+  NEXT_PUBLIC_WAPI_TOKEN = "iraQjMkKP80u84RuNVueGqqNS4hlExaM"
+  NEXT_PUBLIC_WAPI_INSTANCE_ID = "LITE-QX34ES-9ZAQOP"
+  NEXT_PUBLIC_WAPI_BASE_URL = "https://api.w-api.app"
 
 [functions]
   directory = "netlify/functions"

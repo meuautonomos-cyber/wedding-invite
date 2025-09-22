@@ -22,22 +22,23 @@ interface PresenteItem {
 
 export class WhatsAppAutoService {
   private readonly baseUrl: string
-  private readonly zApiToken: string
-  private readonly zApiUrl: string
+  private readonly wapiUrl: string
+  private readonly wapiToken: string
+  private readonly wapiInstanceId: string
 
   constructor(baseUrl: string = 'http://localhost:3001') {
     this.baseUrl = baseUrl
-    // Token do Z-API (você precisa obter em https://z-api.io)
-    this.zApiToken = process.env.NEXT_PUBLIC_ZAPI_TOKEN || ''
-    const instanceId = process.env.NEXT_PUBLIC_ZAPI_INSTANCE_ID || ''
-    this.zApiUrl = `https://api.z-api.io/instances/${instanceId}/token/${this.zApiToken}/send-text`
+    // Configurações da W-API
+    this.wapiUrl = process.env.NEXT_PUBLIC_WAPI_BASE_URL || 'https://api.w-api.app'
+    this.wapiToken = process.env.NEXT_PUBLIC_WAPI_TOKEN || 'iraQjMkKP80u84RuNVueGqqNS4hlExaM'
+    this.wapiInstanceId = process.env.NEXT_PUBLIC_WAPI_INSTANCE_ID || 'LITE-QX34ES-9ZAQOP'
     
     // Debug das configurações
     console.log('🔧 WhatsAppAutoService Config:', {
       baseUrl: this.baseUrl,
-      zApiToken: this.zApiToken ? '***' + this.zApiToken.slice(-4) : 'VAZIO',
-      instanceId: instanceId ? '***' + instanceId.slice(-4) : 'VAZIO',
-      zApiUrl: this.zApiUrl
+      wapiToken: this.wapiToken ? '***' + this.wapiToken.slice(-4) : 'VAZIO',
+      instanceId: this.wapiInstanceId ? '***' + this.wapiInstanceId.slice(-4) : 'VAZIO',
+      wapiUrl: this.wapiUrl
     })
   }
 
@@ -350,12 +351,12 @@ export class WhatsAppAutoService {
     return messageText
   }
 
-  // ENVIO 100% AUTOMÁTICO via Z-API
+  // ENVIO 100% AUTOMÁTICO via W-API
   async sendWhatsAppMessage(data: WhatsAppMessageData, userAgent?: string): Promise<boolean> {
     try {
       // Validar credenciais
-      if (!this.zApiToken || !this.zApiUrl.includes('3E780CBE27A2F0395961EE5C772D9ACD')) {
-        console.error('❌ Credenciais Z-API não configuradas corretamente')
+      if (!this.wapiToken || !this.wapiInstanceId) {
+        console.error('❌ Credenciais W-API não configuradas corretamente')
         return false
       }
       
@@ -369,33 +370,32 @@ export class WhatsAppAutoService {
         localStorage.setItem(`qr-${data.ticketId}`, qrCode)
       }
       
-      // ENVIO AUTOMÁTICO via Z-API
-      const clientToken = process.env.NEXT_PUBLIC_ZAPI_CLIENT_TOKEN || ''
-      console.log('🔧 Debug Z-API:', {
-        url: this.zApiUrl,
-        clientToken: clientToken ? '***' + clientToken.slice(-4) : 'VAZIO',
+      // ENVIO AUTOMÁTICO via W-API
+      console.log('🔧 Debug W-API:', {
+        url: `${this.wapiUrl}/message/sendText/${this.wapiInstanceId}`,
+        token: this.wapiToken ? '***' + this.wapiToken.slice(-4) : 'VAZIO',
         phone: `55${data.telefone}`,
         messageLength: message.length
       })
       
-      const response = await fetch(this.zApiUrl, {
+      const response = await fetch(`${this.wapiUrl}/message/sendText/${this.wapiInstanceId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Client-Token': clientToken
+          'Authorization': `Bearer ${this.wapiToken}`
         },
         body: JSON.stringify({
-          phone: `55${data.telefone}`,
-          message: message
+          number: `55${data.telefone}`,
+          text: message
         })
       })
       
       if (response.ok) {
-        console.log('✅ Mensagem enviada com sucesso via Z-API')
+        console.log('✅ Mensagem enviada com sucesso via W-API')
         return true
       } else {
         const errorText = await response.text()
-        console.error('❌ Erro ao enviar via Z-API:', response.status, errorText)
+        console.error('❌ Erro ao enviar via W-API:', response.status, errorText)
         return false
       }
       
@@ -405,35 +405,33 @@ export class WhatsAppAutoService {
     }
   }
 
-  // Testar conexão com Z-API
+  // Testar conexão com W-API
   async testConnection(): Promise<boolean> {
     try {
-      const clientToken = process.env.NEXT_PUBLIC_ZAPI_CLIENT_TOKEN || ''
-      const instanceId = process.env.NEXT_PUBLIC_ZAPI_INSTANCE_ID || ''
-      const statusUrl = `https://api.z-api.io/instances/${instanceId}/token/${this.zApiToken}/status`
+      const statusUrl = `${this.wapiUrl}/instance/status/${this.wapiInstanceId}`
       
       console.log('🔧 Debug Test Connection:', {
         url: statusUrl,
-        clientToken: clientToken ? '***' + clientToken.slice(-4) : 'VAZIO',
-        instanceId: instanceId ? '***' + instanceId.slice(-4) : 'VAZIO'
+        token: this.wapiToken ? '***' + this.wapiToken.slice(-4) : 'VAZIO',
+        instanceId: this.wapiInstanceId ? '***' + this.wapiInstanceId.slice(-4) : 'VAZIO'
       })
       
       const response = await fetch(statusUrl, {
         method: 'GET',
         headers: {
-          'Client-Token': clientToken
+          'Authorization': `Bearer ${this.wapiToken}`
         }
       })
       
       if (response.ok) {
-        console.log('✅ Conexão Z-API OK')
+        console.log('✅ Conexão W-API OK')
         return true
       } else {
-        console.error('❌ Erro na conexão Z-API:', response.status)
+        console.error('❌ Erro na conexão W-API:', response.status)
         return false
       }
     } catch (error) {
-      console.error('Erro ao testar Z-API:', error)
+      console.error('Erro ao testar W-API:', error)
       return false
     }
   }

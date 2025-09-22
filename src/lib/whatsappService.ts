@@ -154,22 +154,6 @@ export class WhatsAppService {
     }
   }
 
-  // Buscar presentes já sugeridos para um ticket
-  private async getSuggestedPresentesForTicket(ticketId: string): Promise<PresenteItem[]> {
-    try {
-      const suggestions = await supabaseStorage.getPresenteSuggestionsForTicket(ticketId)
-      return suggestions.map(suggestion => ({
-        nome: suggestion.presente_nome,
-        link: suggestion.presente_link,
-        valor: suggestion.presente_valor || 0,
-        categoria: suggestion.presente_categoria || '',
-        prioridade: suggestion.prioridade
-      }))
-    } catch (error) {
-      console.error('Erro ao buscar presentes sugeridos:', error)
-      return []
-    }
-  }
 
   // Sugestões para compra em grupo quando acabar os presentes
   private getGroupPurchaseSuggestions(): PresenteItem[] {

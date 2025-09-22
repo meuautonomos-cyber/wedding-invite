@@ -28,12 +28,10 @@ interface ReconfirmationNotification {
 export class ReconfirmationService {
   private readonly baseUrl: string
   private readonly zApiUrl: string
-  private readonly weddingDate: Date
 
   constructor(baseUrl: string = 'http://localhost:3000', zApiUrl: string = 'http://localhost:3001') {
     this.baseUrl = baseUrl
     this.zApiUrl = zApiUrl
-    this.weddingDate = new Date('2026-03-21') // Data do casamento
   }
 
   // Calcular data limite para reconfirmação (21/02/2026)
@@ -97,7 +95,7 @@ export class ReconfirmationService {
   // Enviar mensagem de reconfirmação individual
   private async sendReconfirmationMessage(reconfirmation: ReconfirmationData): Promise<void> {
     try {
-      const { noivos, evento } = weddingData.casamento
+      const { evento } = weddingData.casamento
       const deadline = new Date(reconfirmation.data_limite)
       const daysLeft = Math.ceil((deadline.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))
       
@@ -212,10 +210,10 @@ export class ReconfirmationService {
 
       // Gerar PIX para pagamento da taxa
       const pixData = {
-        chave: weddingData.casamento.lista_presentes.pix.chave,
+        chave: weddingData.casamento.lista_presentes.pix?.chave || '',
         valor: reconfirmation.taxa_desistencia,
         descricao: `Taxa de desistência - ${reconfirmation.nome} - Casamento Esther & Anthony`,
-        qr: weddingData.casamento.lista_presentes.pix.qr
+        qr: weddingData.casamento.lista_presentes.pix?.qr || ''
       }
 
       // Atualizar status para aguardando pagamento

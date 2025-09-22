@@ -9,7 +9,6 @@ import {
   DocumentArrowDownIcon,
   PhoneIcon,
   CheckCircleIcon,
-  ClockIcon,
   ChatBubbleLeftRightIcon
 } from '@heroicons/react/24/outline'
 

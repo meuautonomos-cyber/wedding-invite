@@ -17,16 +17,6 @@ export default function ReconfirmarPage() {
 
   const reconfirmationService = new ReconfirmationService()
 
-  useEffect(() => {
-    // Pegar ticketId da URL
-    const urlParams = new URLSearchParams(window.location.search)
-    const id = urlParams.get('id')
-    if (id) {
-      setTicketId(id)
-      loadReconfirmation(id)
-    }
-  }, [loadReconfirmation])
-
   const loadReconfirmation = useCallback(async (id: string) => {
     setLoading(true)
     try {
@@ -38,6 +28,16 @@ export default function ReconfirmarPage() {
       setLoading(false)
     }
   }, [])
+
+  useEffect(() => {
+    // Pegar ticketId da URL
+    const urlParams = new URLSearchParams(window.location.search)
+    const id = urlParams.get('id')
+    if (id) {
+      setTicketId(id)
+      loadReconfirmation(id)
+    }
+  }, [loadReconfirmation])
 
   const handleReconfirmation = async (actionType: 'confirm' | 'cancel') => {
     if (!ticketId) return

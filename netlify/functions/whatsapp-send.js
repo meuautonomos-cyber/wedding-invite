@@ -50,7 +50,7 @@ exports.handler = async (event, context) => {
       restricoes_alimentares
     }
 
-    // ENVIO 100% AUTOMÁTICO via Z-API
+    // ENVIO 100% AUTOMÁTICO via W-API
     const success = await sendWhatsAppMessage(whatsappData, userAgent)
     
     if (success) {
@@ -59,7 +59,7 @@ exports.handler = async (event, context) => {
         headers,
         body: JSON.stringify({
           success: true,
-          message: 'Mensagem enviada automaticamente via Z-API',
+          message: 'Mensagem enviada automaticamente via W-API',
           ticketId,
           to,
           automatic: true
@@ -89,24 +89,24 @@ exports.handler = async (event, context) => {
   }
 }
 
-// Função para enviar mensagem via Z-API
+// Função para enviar mensagem via W-API
 async function sendWhatsAppMessage(data, userAgent) {
   try {
-    // Configurações da Z-API
-    const zApiToken = process.env.NEXT_PUBLIC_ZAPI_TOKEN
-    const instanceId = process.env.NEXT_PUBLIC_ZAPI_INSTANCE_ID
-    const clientToken = process.env.NEXT_PUBLIC_ZAPI_CLIENT_TOKEN
+    // Configurações da W-API
+    const wapiToken = process.env.NEXT_PUBLIC_WAPI_TOKEN
+    const instanceId = process.env.NEXT_PUBLIC_WAPI_INSTANCE_ID
+    const wapiUrl = process.env.NEXT_PUBLIC_WAPI_BASE_URL || 'https://api.w-api.app/v1'
     
-    if (!zApiToken || !instanceId || !clientToken) {
-      console.error('❌ Variáveis de ambiente Z-API não configuradas')
+    if (!wapiToken || !instanceId) {
+      console.error('❌ Variáveis de ambiente W-API não configuradas')
       return false
     }
 
-    const zApiUrl = `https://api.z-api.io/instances/${instanceId}/token/${zApiToken}/send-text`
+    const sendUrl = `${wapiUrl}/message/send-text?instanceId=${instanceId}`
     
-    console.log('🔧 Debug Z-API:', {
-      url: zApiUrl,
-      clientToken: clientToken ? '***' + clientToken.slice(-4) : 'VAZIO',
+    console.log('🔧 Debug W-API:', {
+      url: sendUrl,
+      token: wapiToken ? '***' + wapiToken.slice(-4) : 'VAZIO',
       phone: `55${data.telefone}`,
       nome: data.nome
     })
@@ -156,12 +156,12 @@ async function sendWhatsAppMessage(data, userAgent) {
     message += `Com carinho,\n*Esther & Anthony* 💍\n\n`
     message += `Esta mensagem foi enviada automaticamente pelo sistema de convites.`
 
-    // Enviar via Z-API
-    const response = await fetch(zApiUrl, {
+    // Enviar via W-API
+    const response = await fetch(sendUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Client-Token': clientToken
+        'Authorization': `Bearer ${wapiToken}`
       },
       body: JSON.stringify({
         phone: `55${data.telefone}`,
@@ -170,11 +170,11 @@ async function sendWhatsAppMessage(data, userAgent) {
     })
     
     if (response.ok) {
-      console.log('✅ Mensagem enviada com sucesso via Z-API')
+      console.log('✅ Mensagem enviada com sucesso via W-API')
       return true
     } else {
       const errorText = await response.text()
-      console.error('❌ Erro ao enviar via Z-API:', response.status, errorText)
+      console.error('❌ Erro ao enviar via W-API:', response.status, errorText)
       return false
     }
     

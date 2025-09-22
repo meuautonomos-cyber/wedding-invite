@@ -640,6 +640,44 @@ class SupabaseStorage {
     }
   }
 
+  // Criar reconfirmação individual para um convidado
+  async createReconfirmation(ticketId: string, nome: string, telefone: string, email?: string): Promise<boolean> {
+    try {
+      // Data limite: 21/02/2026
+      const deadline = new Date('2026-02-21T23:59:59-03:00')
+      
+      const reconfirmationData = {
+        ticket_id: ticketId,
+        nome: nome,
+        telefone: telefone,
+        email: email || '',
+        status: 'pendente',
+        data_limite: deadline.toISOString(),
+        taxa_desistencia: 150.00,
+        taxa_paga: false
+      }
+
+      const { error } = await supabase
+        .from('wedding_reconfirmations')
+        .insert(reconfirmationData)
+
+      if (error) {
+        if (error.code === 'PGRST116' || error.message?.includes('relation "wedding_reconfirmations" does not exist')) {
+          console.log('Tabela wedding_reconfirmations não existe. Execute o schema SQL primeiro.')
+          return false
+        }
+        console.error('Erro ao criar reconfirmação individual:', error)
+        return false
+      }
+
+      console.log('Reconfirmação criada para:', nome)
+      return true
+    } catch (error) {
+      console.error('Erro ao criar reconfirmação individual:', error)
+      return false
+    }
+  }
+
   async getPendingReconfirmations(): Promise<any[]> {
     try {
       const { data, error } = await supabase

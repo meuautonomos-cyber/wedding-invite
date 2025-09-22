@@ -125,11 +125,11 @@ export class WhatsAppAutoService {
   private async getSmartPresenteSuggestions(ticketId: string, userAgent?: string): Promise<PresenteItem[]> {
     try {
       // Buscar presentes já sugeridos para este ticket
-      const suggestedPresentes = await this.getSuggestedPresentesForTicket(ticketId)
+      const existingSuggestions = await this.getSuggestedPresentesForTicket(ticketId)
       
       // Se já tem sugestão para este ticket, retornar a existente
-      if (suggestedPresentes.length > 0) {
-        return suggestedPresentes
+      if (existingSuggestions.length > 0) {
+        return existingSuggestions
       }
       
       // Detectar tipo de dispositivo
@@ -148,6 +148,9 @@ export class WhatsAppAutoService {
       const availablePresentes = allPresentes.filter(presente => 
         !allSuggestedPresentes.includes(presente.nome)
       )
+      
+      console.log('🎁 AutoService - Sugestões disponíveis:', availablePresentes.length, 'de', allPresentes.length)
+      console.log('🎁 AutoService - Já sugeridos:', allSuggestedPresentes)
       
       let suggestions: PresenteItem[] = []
       
@@ -213,6 +216,10 @@ export class WhatsAppAutoService {
         // Salvar sugestões no Supabase
         await supabaseStorage.savePresenteSuggestions(ticketId, suggestions)
         
+        if (suggestions.length > 0 && suggestions[0]) {
+          console.log('🎁 AutoService - Sugerindo:', suggestions[0].nome)
+        }
+        
         return suggestions
       }
       
@@ -221,6 +228,8 @@ export class WhatsAppAutoService {
       
       // Salvar sugestões de grupo no Supabase
       await supabaseStorage.savePresenteSuggestions(ticketId, groupSuggestions)
+      
+      console.log('🎁 AutoService - Sugerindo compra em grupo:', groupSuggestions.length, 'itens')
       
       return groupSuggestions
     } catch (error) {

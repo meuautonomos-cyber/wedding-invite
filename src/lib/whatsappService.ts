@@ -1,6 +1,7 @@
 import { weddingData } from '@/data/weddingData'
 import { supabaseStorage } from './supabaseStorage'
 import { ReminderService } from './reminderService'
+import { supabase } from './supabase'
 import QRCode from 'qrcode'
 
 interface WhatsAppMessageData {
@@ -137,6 +138,9 @@ export class WhatsAppService {
         !allSuggestedPresentes.includes(presente.nome)
       )
       
+      console.log('🎁 Sugestões disponíveis:', availablePresentes.length, 'de', allPresentes.length)
+      console.log('🎁 Já sugeridos:', allSuggestedPresentes)
+      
       // Se ainda há presentes disponíveis, sugerir APENAS 1 presente por pessoa
       if (availablePresentes.length > 0) {
         const suggestions = availablePresentes.slice(0, 1) // APENAS 1 presente por pessoa
@@ -144,19 +148,18 @@ export class WhatsAppService {
         // Salvar sugestões no Supabase
         await supabaseStorage.savePresenteSuggestions(ticketId, suggestions)
         
+        console.log('🎁 Sugerindo:', suggestions[0]?.nome)
         return suggestions
       }
       
       // Se acabaram os presentes, sugerir compra em grupo
       const groupSuggestions = this.getGroupPurchaseSuggestions()
-      
-      // Salvar sugestões de grupo no Supabase
-      await supabaseStorage.savePresenteSuggestions(ticketId, groupSuggestions)
+      console.log('🎁 Sugerindo compra em grupo:', groupSuggestions.length, 'itens')
       
       return groupSuggestions
     } catch (error) {
       console.error('Erro ao obter sugestões:', error)
-      return this.getPresentesList().slice(0, 5)
+      return this.getPresentesList().slice(0, 1) // Apenas 1 presente em caso de erro
     }
   }
 
@@ -351,6 +354,44 @@ export class WhatsAppService {
     } catch (error) {
       console.error('Erro no fallback:', error)
       return false
+    }
+  }
+
+  // Função para resetar sugestões (útil para testes ou quando todos os presentes foram sugeridos)
+  static async resetSuggestedPresentes(): Promise<void> {
+    try {
+      // Limpar todas as sugestões da tabela
+      const { error } = await supabase
+        .from('wedding_presente_suggestions')
+        .delete()
+        .neq('id', 0) // Deletar todos os registros
+      
+      if (error) {
+        console.error('Erro ao resetar sugestões:', error)
+      } else {
+        console.log('🔄 Sugestões de presentes resetadas no Supabase')
+      }
+    } catch (error) {
+      console.error('Erro ao resetar sugestões:', error)
+    }
+  }
+
+  // Função para verificar quantos presentes já foram sugeridos
+  static async getSuggestedPresentesCount(): Promise<number> {
+    try {
+      const { count, error } = await supabase
+        .from('wedding_presente_suggestions')
+        .select('*', { count: 'exact', head: true })
+      
+      if (error) {
+        console.error('Erro ao contar sugestões:', error)
+        return 0
+      }
+      
+      return count || 0
+    } catch (error) {
+      console.error('Erro ao contar sugestões:', error)
+      return 0
     }
   }
 }

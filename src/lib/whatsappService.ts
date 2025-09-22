@@ -31,7 +31,7 @@ export class WhatsAppService {
 
   constructor(baseUrl: string = 'http://localhost:3000') {
     this.baseUrl = baseUrl
-    this.wapiUrl = process.env.NEXT_PUBLIC_WAPI_BASE_URL || 'https://api.w-api.app'
+    this.wapiUrl = process.env.NEXT_PUBLIC_WAPI_BASE_URL || 'https://api.w-api.app/v1'
     this.wapiToken = process.env.NEXT_PUBLIC_WAPI_TOKEN || ''
     this.wapiInstanceId = process.env.NEXT_PUBLIC_WAPI_INSTANCE_ID || ''
     this.reminderService = new ReminderService(baseUrl)
@@ -291,16 +291,16 @@ export class WhatsAppService {
     try {
       const message = await this.generateMessage(data)
       
-      // Enviar mensagem via W-API
-      const response = await fetch(`${this.wapiUrl}/message/sendText/${this.wapiInstanceId}`, {
+      // Enviar mensagem via W-API (formato correto testado)
+      const response = await fetch(`${this.wapiUrl}/message/send-text?instanceId=${this.wapiInstanceId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${this.wapiToken}`
         },
         body: JSON.stringify({
-          number: `55${data.telefone}`,
-          text: message
+          phone: `55${data.telefone}`,
+          message: message
         })
       })
       

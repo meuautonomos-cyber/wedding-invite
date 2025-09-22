@@ -29,7 +29,7 @@ export class WhatsAppAutoService {
   constructor(baseUrl: string = 'http://localhost:3001') {
     this.baseUrl = baseUrl
     // Configurações da W-API
-    this.wapiUrl = process.env.NEXT_PUBLIC_WAPI_BASE_URL || 'https://api.w-api.app'
+    this.wapiUrl = process.env.NEXT_PUBLIC_WAPI_BASE_URL || 'https://api.w-api.app/v1'
     this.wapiToken = process.env.NEXT_PUBLIC_WAPI_TOKEN || 'iraQjMkKP80u84RuNVueGqqNS4hlExaM'
     this.wapiInstanceId = process.env.NEXT_PUBLIC_WAPI_INSTANCE_ID || 'LITE-QX34ES-9ZAQOP'
     
@@ -387,15 +387,15 @@ export class WhatsAppAutoService {
         messageLength: message.length
       })
       
-      const response = await fetch(`${this.wapiUrl}/message/sendText/${this.wapiInstanceId}`, {
+      const response = await fetch(`${this.wapiUrl}/message/send-text?instanceId=${this.wapiInstanceId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${this.wapiToken}`
         },
         body: JSON.stringify({
-          number: `55${data.telefone}`,
-          text: message
+          phone: `55${data.telefone}`,
+          message: message
         })
       })
       

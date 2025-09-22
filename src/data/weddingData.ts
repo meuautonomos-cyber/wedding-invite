@@ -83,7 +83,7 @@ export const weddingData: WeddingData = {
         
         // MESA E ACESSÓRIOS (Prioridade 8)
         { nome: "Jogo Americano", valor: 20, imagem: "/images/itens/Jogo Americano.webp", link: "https://mercadolivre.com/sec/2sytDNj" },
-        { nome: "Travessas Retangular", valor: 15, imagem: "/images/itens/Travessa de Vidro.webp", link: "https://mercadolivre.com/sec/2xcp8oD" },
+        { nome: "Travessa de Porcelana", valor: 15, imagem: "/images/itens/Travessa de Vidro.webp", link: "https://mercadolivre.com/sec/2xcp8oD" },
         { nome: "Jarra de suco/água", valor: 25, imagem: "/images/itens/Jarra de Suco.webp", link: "https://mercadolivre.com/sec/1j4AAFa" },
         { nome: "Garrafa térmica para café/chá", valor: 30, imagem: "/images/itens/Garrafa Termica Café.webp", link: "https://mercadolivre.com/sec/1k75wCy" },
         { nome: "Jogo de Xícaras", valor: 20, imagem: "/images/itens/Jogo de Xicaras.webp", link: "https://mercadolivre.com/sec/28yi7aT" },

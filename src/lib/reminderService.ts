@@ -20,7 +20,7 @@ export class ReminderService {
   private readonly wapiToken: string
   private readonly wapiInstanceId: string
 
-  constructor(baseUrl: string = 'http://localhost:3000') {
+  constructor(baseUrl: string = process.env.NEXT_PUBLIC_BASE_URL || 'https://eclectic-biscochitos-4c5969.netlify.app') {
     this.baseUrl = baseUrl
     this.wapiUrl = process.env.NEXT_PUBLIC_WAPI_BASE_URL || 'https://api.w-api.app/v1'
     this.wapiToken = process.env.NEXT_PUBLIC_WAPI_TOKEN || 'iraQjMkKP80u84RuNVueGqqNS4hlExaM'

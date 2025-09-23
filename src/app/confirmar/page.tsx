@@ -110,7 +110,7 @@ export default function ConfirmarPage() {
         try {
           // ENVIO 100% AUTOMÁTICO via WhatsAppService direto
           const { WhatsAppService } = await import('@/lib/whatsappService')
-          const whatsappService = new WhatsAppService()
+          const whatsappService = new WhatsAppService(process.env.NEXT_PUBLIC_BASE_URL || 'https://eclectic-biscochitos-4c5969.netlify.app')
           
           const whatsappData = {
             nome: formData.nome,

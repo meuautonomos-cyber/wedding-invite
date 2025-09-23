@@ -308,16 +308,20 @@ export class WhatsAppService {
         const result = await response.json()
         console.log('✅ W-API retornou sucesso:', result)
         
-        // Criar lembretes automáticos para o convidado
-        try {
-          await this.reminderService.createRemindersForGuest(
-            data.ticketId, 
-            data.nome, 
-            data.telefone
-          )
-          console.log('📅 Lembretes criados para:', data.nome)
-        } catch (error) {
-          console.error('Erro ao criar lembretes:', error)
+        // Criar lembretes automáticos APENAS para convidados confirmados
+        if (data.status === 'confirmado' || data.status === 'com_acompanhante') {
+          try {
+            await this.reminderService.createRemindersForGuest(
+              data.ticketId, 
+              data.nome, 
+              data.telefone
+            )
+            console.log('📅 Lembretes criados para convidado confirmado:', data.nome)
+          } catch (error) {
+            console.error('Erro ao criar lembretes:', error)
+          }
+        } else {
+          console.log('⚠️ Lembretes NÃO criados - convidado não confirmou presença:', data.nome)
         }
         
         // Abrir WhatsApp Web com a mensagem

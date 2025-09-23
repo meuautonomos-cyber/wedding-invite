@@ -514,11 +514,16 @@ class SupabaseStorage {
 
   async getPendingReminders(): Promise<any[]> {
     try {
+      // Buscar lembretes pendentes com JOIN para verificar status do convidado
       const { data, error } = await supabase
         .from('wedding_reminders')
-        .select('*')
+        .select(`
+          *,
+          wedding_tickets!inner(status)
+        `)
         .eq('status', 'pendente')
         .lte('proximo_envio', new Date().toISOString())
+        .in('wedding_tickets.status', ['confirmado', 'com_acompanhante']) // APENAS convidados confirmados
 
       if (error) {
         console.error('Erro ao buscar lembretes pendentes:', error)

@@ -8,10 +8,10 @@ interface WhatsAppMessageData {
   nome: string
   telefone: string
   status: 'confirmado' | 'com_acompanhante' | 'nao_poderei'
-  acompanhante?: string
+  acompanhante?: string | undefined
   observacoes?: string
   ticketId: string
-  restricoes_alimentares?: string
+  restricoes_alimentares?: string | undefined
 }
 
 interface PresenteItem {

@@ -110,26 +110,24 @@ export default function ConfirmarPage() {
       // Enviar WhatsApp automaticamente APENAS se confirmar presença
       if (formData.status !== 'nao_podera_ir') {
         try {
-          // ENVIO 100% AUTOMÁTICO via Netlify Function
-          const response = await fetch('/.netlify/functions/whatsapp-send', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              to: `55${formData.telefone}`,
-              ticketId: ticket.id,
-              nome: formData.nome,
-              status: formData.status,
-              acompanhante: formData.status === 'com_acompanhante' ? formData.observacoes : undefined,
-              observacoes: formData.restricoes_alimentares || formData.observacoes || '',
-              restricoes_alimentares: formData.restricoes_alimentares
-            })
-          })
+          // ENVIO 100% AUTOMÁTICO via WhatsAppService direto
+          const { WhatsAppService } = await import('@/lib/whatsappService')
+          const whatsappService = new WhatsAppService()
           
-          if (response.ok) {
-            const result = await response.json()
-            console.log('✅ Mensagem enviada automaticamente!', result)
+          const whatsappData = {
+            nome: formData.nome,
+            telefone: formData.telefone,
+            status: formData.status,
+            acompanhante: formData.status === 'com_acompanhante' ? formData.observacoes : undefined,
+            observacoes: formData.restricoes_alimentares || formData.observacoes || '',
+            ticketId: ticket.id,
+            restricoes_alimentares: formData.restricoes_alimentares
+          }
+          
+          const success = await whatsappService.sendViaAPI(whatsappData)
+          
+          if (success) {
+            console.log('✅ Mensagem enviada automaticamente via W-API!')
             setWhatsappSent(true)
           } else {
             console.log('⚠️ Falha no envio automático')

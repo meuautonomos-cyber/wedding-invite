@@ -35,6 +35,13 @@ export class WhatsAppService {
     this.wapiToken = process.env.NEXT_PUBLIC_WAPI_TOKEN || ''
     this.wapiInstanceId = process.env.NEXT_PUBLIC_WAPI_INSTANCE_ID || ''
     this.reminderService = new ReminderService(baseUrl)
+    
+    // Debug das variáveis de ambiente
+    console.log('🔧 Debug W-API Config:', {
+      wapiUrl: this.wapiUrl,
+      wapiToken: this.wapiToken ? '***' + this.wapiToken.slice(-4) : 'VAZIO',
+      wapiInstanceId: this.wapiInstanceId || 'VAZIO'
+    })
   }
 
   // Lista de presentes com valores e prioridades

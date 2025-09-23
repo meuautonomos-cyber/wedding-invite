@@ -116,7 +116,7 @@ export default function ConfirmarPage() {
             nome: formData.nome,
             telefone: formData.telefone,
             status: formData.status,
-            acompanhante: formData.status === 'com_acompanhante' ? formData.observacoes : undefined,
+            acompanhante: formData.status === 'com_acompanhante' ? (formData.observacoes || '') : undefined,
             observacoes: formData.restricoes_alimentares || formData.observacoes || '',
             ticketId: ticket.id,
             restricoes_alimentares: formData.restricoes_alimentares

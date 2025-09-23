@@ -514,16 +514,27 @@ class SupabaseStorage {
 
   async getPendingReminders(): Promise<any[]> {
     try {
-      // Buscar lembretes pendentes com JOIN para verificar status do convidado
-      const { data, error } = await supabase
+      const hoje = new Date()
+      const dataLimite = new Date('2026-02-21T23:59:59-03:00') // 21/02/2026
+      
+      let query = supabase
         .from('wedding_reminders')
         .select(`
           *,
           wedding_tickets!inner(status)
         `)
         .eq('status', 'pendente')
-        .lte('proximo_envio', new Date().toISOString())
-        .in('wedding_tickets.status', ['confirmado', 'com_acompanhante']) // APENAS convidados confirmados
+        .lte('proximo_envio', hoje.toISOString())
+
+      // APÓS 21/02: Apenas convidados confirmados recebem lembretes
+      if (hoje > dataLimite) {
+        query = query.in('wedding_tickets.status', ['confirmado', 'com_acompanhante'])
+        console.log('📅 Pós 21/02: Enviando lembretes APENAS para convidados confirmados')
+      } else {
+        console.log('📅 Antes 21/02: Enviando lembretes para TODOS os inscritos')
+      }
+
+      const { data, error } = await query
 
       if (error) {
         console.error('Erro ao buscar lembretes pendentes:', error)
@@ -648,6 +659,8 @@ class SupabaseStorage {
   // Criar reconfirmação individual para um convidado
   async createReconfirmation(ticketId: string, nome: string, telefone: string, email?: string): Promise<boolean> {
     try {
+      console.log('🔄 Criando reconfirmação para:', { ticketId, nome, telefone, email })
+      
       // Data limite: 21/02/2026
       const deadline = new Date('2026-02-21T23:59:59-03:00')
       
@@ -662,23 +675,25 @@ class SupabaseStorage {
         taxa_paga: false
       }
 
+      console.log('📋 Dados da reconfirmação:', reconfirmationData)
+
       const { error } = await supabase
         .from('wedding_reconfirmations')
         .insert(reconfirmationData)
 
       if (error) {
         if (error.code === 'PGRST116' || error.message?.includes('relation "wedding_reconfirmations" does not exist')) {
-          console.log('Tabela wedding_reconfirmations não existe. Execute o schema SQL primeiro.')
+          console.log('❌ Tabela wedding_reconfirmations não existe. Execute o schema SQL primeiro.')
           return false
         }
-        console.error('Erro ao criar reconfirmação individual:', error)
+        console.error('❌ Erro ao criar reconfirmação individual:', error)
         return false
       }
 
-      console.log('Reconfirmação criada para:', nome)
+      console.log('✅ Reconfirmação criada com sucesso para:', nome)
       return true
     } catch (error) {
-      console.error('Erro ao criar reconfirmação individual:', error)
+      console.error('❌ Erro ao criar reconfirmação individual:', error)
       return false
     }
   }

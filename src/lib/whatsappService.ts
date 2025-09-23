@@ -308,20 +308,28 @@ export class WhatsAppService {
         const result = await response.json()
         console.log('✅ W-API retornou sucesso:', result)
         
-        // Criar lembretes automáticos APENAS para convidados confirmados
-        if (data.status === 'confirmado' || data.status === 'com_acompanhante') {
+        // Criar lembretes automáticos baseado na data e status
+        const hoje = new Date()
+        const dataLimite = new Date('2026-02-21T23:59:59-03:00') // 21/02/2026
+        
+        // ANTES 21/02: Todos recebem lembretes
+        // APÓS 21/02: Apenas confirmados recebem lembretes
+        const deveCriarLembretes = hoje <= dataLimite || 
+          (hoje > dataLimite && (data.status === 'confirmado' || data.status === 'com_acompanhante'))
+        
+        if (deveCriarLembretes) {
           try {
             await this.reminderService.createRemindersForGuest(
               data.ticketId, 
               data.nome, 
               data.telefone
             )
-            console.log('📅 Lembretes criados para convidado confirmado:', data.nome)
+            console.log(`📅 Lembretes criados para ${data.nome} (${hoje <= dataLimite ? 'antes' : 'após'} 21/02)`)
           } catch (error) {
             console.error('Erro ao criar lembretes:', error)
           }
         } else {
-          console.log('⚠️ Lembretes NÃO criados - convidado não confirmou presença:', data.nome)
+          console.log('⚠️ Lembretes NÃO criados - pós 21/02 e convidado não confirmou presença:', data.nome)
         }
         
         // Abrir WhatsApp Web com a mensagem

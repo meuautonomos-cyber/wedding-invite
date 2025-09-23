@@ -91,20 +91,18 @@ export default function ConfirmarPage() {
 
       console.log('RSVP e ingresso criados:', ticket)
       
-      // Criar reconfirmação automaticamente para convidados confirmados
-      if (formData.status === 'confirmado' || formData.status === 'com_acompanhante') {
-        try {
-          await supabaseStorage.createReconfirmation(
-            ticket.id,
-            formData.nome,
-            formData.telefone,
-            formData.email
-          )
-          console.log('Reconfirmação criada para:', formData.nome)
-        } catch (error) {
-          console.error('Erro ao criar reconfirmação:', error)
-          // Não falhar o processo se a reconfirmação não for criada
-        }
+      // Criar reconfirmação automaticamente para TODOS os convidados (confirmados ou não)
+      try {
+        await supabaseStorage.createReconfirmation(
+          ticket.id,
+          formData.nome,
+          formData.telefone,
+          formData.email
+        )
+        console.log('✅ Reconfirmação criada automaticamente para:', formData.nome)
+      } catch (error) {
+        console.error('❌ Erro ao criar reconfirmação:', error)
+        // Não falhar o processo se a reconfirmação não for criada
       }
       
       // Enviar WhatsApp automaticamente APENAS se confirmar presença

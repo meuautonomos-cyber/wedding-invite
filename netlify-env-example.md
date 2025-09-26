@@ -6,8 +6,8 @@ Para que o envio automático de WhatsApp funcione no Netlify, você precisa conf
 
 ### **Configurações da W-API (WhatsApp Automático)**
 ```
-NEXT_PUBLIC_WAPI_TOKEN=SEU_TOKEN_AQUI
-NEXT_PUBLIC_WAPI_INSTANCE_ID=SEU_INSTANCE_ID_AQUI
+NEXT_PUBLIC_WAPI_TOKEN=jraQjMkKP80u84RuNVueGqqNS4hIExa7M
+NEXT_PUBLIC_WAPI_INSTANCE_ID=LITE-QX34ES-9ZAQ0P
 NEXT_PUBLIC_WAPI_BASE_URL=https://api.w-api.app/v1
 ```
 

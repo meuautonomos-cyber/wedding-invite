@@ -23,8 +23,8 @@ export class ReminderService {
   constructor(baseUrl: string = process.env.NEXT_PUBLIC_BASE_URL || 'https://eclectic-biscochitos-4c5969.netlify.app') {
     this.baseUrl = baseUrl
     this.wapiUrl = process.env.NEXT_PUBLIC_WAPI_BASE_URL || 'https://api.w-api.app/v1'
-    this.wapiToken = process.env.NEXT_PUBLIC_WAPI_TOKEN || 'iraQjMkKP80u84RuNVueGqqNS4hlExaM'
-    this.wapiInstanceId = process.env.NEXT_PUBLIC_WAPI_INSTANCE_ID || 'LITE-QX34ES-9ZAQOP'
+    this.wapiToken = process.env.NEXT_PUBLIC_WAPI_TOKEN || 'jraQjMkKP80u84RuNVueGqqNS4hIExa7M'
+    this.wapiInstanceId = process.env.NEXT_PUBLIC_WAPI_INSTANCE_ID || 'LITE-QX34ES-9ZAQ0P'
   }
 
   // Calcular quantos dias restam até o casamento

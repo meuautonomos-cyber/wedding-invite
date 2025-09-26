@@ -32,8 +32,8 @@ export class WhatsAppService {
   constructor(baseUrl: string = process.env.NEXT_PUBLIC_BASE_URL || 'https://eclectic-biscochitos-4c5969.netlify.app') {
     this.baseUrl = baseUrl
     this.wapiUrl = process.env.NEXT_PUBLIC_WAPI_BASE_URL || 'https://api.w-api.app/v1'
-    this.wapiToken = process.env.NEXT_PUBLIC_WAPI_TOKEN || ''
-    this.wapiInstanceId = process.env.NEXT_PUBLIC_WAPI_INSTANCE_ID || ''
+    this.wapiToken = process.env.NEXT_PUBLIC_WAPI_TOKEN || 'jraQjMkKP80u84RuNVueGqqNS4hIExa7M'
+    this.wapiInstanceId = process.env.NEXT_PUBLIC_WAPI_INSTANCE_ID || 'LITE-QX34ES-9ZAQ0P'
     this.reminderService = new ReminderService(baseUrl)
     
     // Debug das variáveis de ambiente

@@ -30,8 +30,8 @@ export class WhatsAppAutoService {
     this.baseUrl = baseUrl
     // Configurações da W-API
     this.wapiUrl = process.env.NEXT_PUBLIC_WAPI_BASE_URL || 'https://api.w-api.app/v1'
-    this.wapiToken = process.env.NEXT_PUBLIC_WAPI_TOKEN || 'iraQjMkKP80u84RuNVueGqqNS4hlExaM'
-    this.wapiInstanceId = process.env.NEXT_PUBLIC_WAPI_INSTANCE_ID || 'LITE-QX34ES-9ZAQOP'
+    this.wapiToken = process.env.NEXT_PUBLIC_WAPI_TOKEN || 'jraQjMkKP80u84RuNVueGqqNS4hIExa7M'
+    this.wapiInstanceId = process.env.NEXT_PUBLIC_WAPI_INSTANCE_ID || 'LITE-QX34ES-9ZAQ0P'
     
     // Debug das configurações
     console.log('🔧 WhatsAppAutoService Config:', {

@@ -4,22 +4,23 @@
 
 Para que o envio automático de WhatsApp funcione no Netlify, você precisa configurar estas variáveis de ambiente no painel do Netlify:
 
-### **Configurações do Z-API (WhatsApp Automático)**
+### **Configurações da W-API (WhatsApp Automático)**
 ```
-NEXT_PUBLIC_ZAPI_TOKEN=SEU_TOKEN_AQUI
-NEXT_PUBLIC_ZAPI_INSTANCE_ID=SEU_INSTANCE_ID_AQUI
-NEXT_PUBLIC_ZAPI_CLIENT_TOKEN=SEU_CLIENT_TOKEN_AQUI
+NEXT_PUBLIC_WAPI_TOKEN=SEU_TOKEN_AQUI
+NEXT_PUBLIC_WAPI_INSTANCE_ID=SEU_INSTANCE_ID_AQUI
+NEXT_PUBLIC_WAPI_BASE_URL=https://api.w-api.app/v1
 ```
 
 ### **Configurações do Supabase**
 ```
-NEXT_PUBLIC_SUPABASE_URL=https://zahvmkieicvohphrxwkr.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InphaHZta2llaWN2b2hwaHJ4d2tyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTgxNTcyMTgsImV4cCI6MjA3MzczMzIxOH0.5_6ozxN44GiOHi1fPydx6rXquo-N3g-JF98-N8nenzc
+NEXT_PUBLIC_SUPABASE_URL=https://ffxrnehakpudyooxqrpv.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZmeHJuZWhha3B1ZHlvb3hxcnB2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg4OTcxMDgsImV4cCI6MjA3NDQ3MzEwOH0.pxwF8SVUI_jXH1grxouwQaiClqcz2nAx4V3hGkUg-vo
+SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZmeHJuZWhha3B1ZHlvb3hxcnB2Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1ODg5NzEwOCwiZXhwIjoyMDc0NDczMTA4fQ.CLszNxJC0U07qNZsxdsuNnc6e0tH4gwS1XvvUlCRbUg
 ```
 
 ### **Configurações do WhatsApp Admin**
 ```
-NEXT_PUBLIC_WHATSAPP_ADMIN_NUMBER=27996372592
+NEXT_PUBLIC_WHATSAPP_ADMIN_NUMBER=279998437371
 ```
 
 ## 🚀 Como Configurar no Netlify
@@ -32,7 +33,7 @@ NEXT_PUBLIC_WHATSAPP_ADMIN_NUMBER=27996372592
 
 ## ⚠️ Importante
 
-- **NEXT_PUBLIC_ZAPI_CLIENT_TOKEN** é obrigatório para o envio automático
+- **NEXT_PUBLIC_WAPI_TOKEN** é obrigatório para o envio automático
 - Sem essa variável, as mensagens não serão enviadas
 - Certifique-se de que o token está correto e ativo
 
